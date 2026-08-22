@@ -1,0 +1,9 @@
+{
+ "total": 100,
+ "last30d": 79,
+ "by_source": {
+  "cloudflare": 50,
+  "github": 50
+ },
+ "unresolved": 0
+}
