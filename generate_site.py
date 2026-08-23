@@ -7,7 +7,7 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-DB = ROOT / "statusfeed.db"
+DB = ROOT.parent / "statusfeed.db"
 OUT = ROOT / "index.html"
 SAMPLE = ROOT / "statuspulse-sample.csv"
 LINK_STANDARD = "https://buy.stripe.com/9B6eVe0wp7eGaVc1bT8og00"
@@ -97,6 +97,16 @@ table{{border-collapse:collapse;width:100%;font-size:.9rem}}td,th{{padding:.55re
 <div class="cta"><h2>Download or subscribe</h2><p><a href="statuspulse-sample.csv" download>Download the current 100-row CSV sample</a> · <a href="https://github.com/statusfeed-dev/statuspulse-export">Use the free CLI exporter</a></p><p>The paid release includes the current full CSV/SQLite dataset for SRE, platform, vendor-management, and reliability-research workflows.</p><p><a href="{LINK_STANDARD}">Subscribe — $5/month</a> · <a href="{LINK_FOUNDING}">Founding member — $3/month</a></p><small>Initial subscribers receive the current release. Automated subscriber delivery is being connected; do not rely on this page as an API endpoint.</small></div>
 <p><small>Collected from official public Statuspage API endpoints with source provenance. Built by statusfeed-dev.</small></p></body></html>'''
     OUT.write_text(page, encoding="utf-8")
+    stats = {
+        "total": len(rows),
+        "last30d": len(recent),
+        "coverage_start": min((r["started_at"] for r in rows), default=None),
+        "coverage_end": max((r["started_at"] for r in rows), default=None),
+        "computed_at": now.isoformat(),
+        "by_source": provider_counts,
+        "unresolved": len(unresolved),
+    }
+    (ROOT / "stats.json").write_text(__import__("json").dumps(stats, indent=2) + "\n", encoding="utf-8")
     print(f"generated {OUT.name}: {len(rows)} total, {len(recent)} recent, {len(unresolved)} unresolved, {len(providers)} sources")
 
 

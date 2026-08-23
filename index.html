@@ -1,59 +1,52 @@
-<!doctype html><html><head><meta charset=utf-8><title>StatusPulse — cross-provider incident history</title>
-<style>body{font-family:system-ui;max-width:820px;margin:2rem auto;padding:0 1rem;color:#222}
-h1 span{color:#0a7}table{border-collapse:collapse;width:100%;font-size:.9rem}
-td,th{padding:.45rem .6rem;border-bottom:1px solid #ddd;text-align:left}
-.tag{background:#eee;border-radius:4px;padding:2px 6px;font-size:.8rem}</style></head><body>
-<h1>Status<span>Pulse</span> — public status-page incident history</h1>
-<p>Clean, queryable incident history across major providers (GitHub, Cloudflare — more added weekly).
-<b>Free:</b> this live recent-incidents table + a 100-row CSV sample.
-<b>$5/mo:</b> full SQLite + CSV dataset (all collected history, all sources), refreshed hourly.</p>
-<p><a href="statuspulse-sample.csv" download>Download the free 100-row CSV sample →</a></p>
-<p class=tag>170 incidents in the last 30 days · 389 total collected · updated hourly</p>
-<table><tr><th>Provider</th><th>Incident</th><th>Status</th><th>Started</th></tr><tr><td>cloudflare</td><td>Network connectivity issues in Dubai (DXB)</td><td>resolved</td><td>2026-08-22</td></tr>
-<tr><td>cloudflare</td><td>Zero Trust Client Posture Failures</td><td>resolved</td><td>2026-08-21</td></tr>
-<tr><td>cloudflare</td><td>Network Performance Issues in Asia Pacific Region</td><td>resolved</td><td>2026-08-21</td></tr>
-<tr><td>cloudflare</td><td>Increased Errors for Durable Objects in the Hong Kong region</td><td>resolved</td><td>2026-08-21</td></tr>
-<tr><td>cloudflare</td><td>Network performance issue in Mumbai</td><td>resolved</td><td>2026-08-21</td></tr>
-<tr><td>cloudflare</td><td>Cloudflare Access Browser-based RDP Issue</td><td>resolved</td><td>2026-08-21</td></tr>
-<tr><td>cloudflare</td><td>MTLS Validation issues</td><td>resolved</td><td>2026-08-21</td></tr>
-<tr><td>cloudflare</td><td>Missing R2 Audit Logs</td><td>resolved</td><td>2026-08-20</td></tr>
-<tr><td>cloudflare</td><td>Elevated Errors R2 and Durable Objects</td><td>resolved</td><td>2026-08-20</td></tr>
-<tr><td>cloudflare</td><td>Durable Objects and Downstream Service Errors</td><td>resolved</td><td>2026-08-20</td></tr>
-<tr><td>github</td><td>Intermittent failures creating agent tasks</td><td>resolved</td><td>2026-08-20</td></tr>
-<tr><td>cloudflare</td><td>Increased Errors for Durable Objects and Downstream Services in Indonesia</td><td>resolved</td><td>2026-08-20</td></tr>
-<tr><td>cloudflare</td><td>Network Performance Issues in India</td><td>resolved</td><td>2026-08-20</td></tr>
-<tr><td>cloudflare</td><td>Network performance issue in Singapore</td><td>resolved</td><td>2026-08-20</td></tr>
-<tr><td>cloudflare</td><td>Elevated error rates in Chicago (ORD) region.</td><td>resolved</td><td>2026-08-19</td></tr>
-<tr><td>cloudflare</td><td>Workers AI GLM 5.2 is unavailable</td><td>resolved</td><td>2026-08-19</td></tr>
-<tr><td>cloudflare</td><td>Increased Errors for Durable Objects in the Hong Kong region</td><td>resolved</td><td>2026-08-19</td></tr>
-<tr><td>cloudflare</td><td>CDNJS Elevated Errors</td><td>resolved</td><td>2026-08-18</td></tr>
-<tr><td>github</td><td>Incident with Actions</td><td>resolved</td><td>2026-08-18</td></tr>
-<tr><td>github</td><td>Intermittent failures in runner group and runner-related permissions pages</td><td>resolved</td><td>2026-08-18</td></tr>
-<tr><td>cloudflare</td><td>Lists Service Degraded</td><td>resolved</td><td>2026-08-17</td></tr>
-<tr><td>cloudflare</td><td>Network Performance Issues in Phoenix, Los Angeles</td><td>resolved</td><td>2026-08-17</td></tr>
-<tr><td>cloudflare</td><td>Cloudflare Dashboard Issues</td><td>resolved</td><td>2026-08-17</td></tr>
-<tr><td>github</td><td>Incident with GitHub.com</td><td>resolved</td><td>2026-08-17</td></tr>
-<tr><td>cloudflare</td><td>Cloudflare Lists Bulk Actions failing</td><td>resolved</td><td>2026-08-17</td></tr></table>
-<h2>Reliability scorecard — median time-to-resolve</h2>
-<table><tr><th>Provider</th><th>Median MTTR</th><th>Sample</th></tr><tr><td>vercel</td><td>1.02 h</td><td>50</td></tr>
-<tr><td>cloudflare</td><td>1.18 h</td><td>50</td></tr>
-<tr><td>datadog</td><td>1.53 h</td><td>50</td></tr>
-<tr><td>atlassian</td><td>2.01 h</td><td>31</td></tr>
-<tr><td>digitalocean</td><td>2.36 h</td><td>50</td></tr>
-<tr><td>supabase</td><td>2.71 h</td><td>48</td></tr>
-<tr><td>twilio</td><td>4.02 h</td><td>48</td></tr>
-<tr><td>github</td><td>94.65 h</td><td>50</td></tr></table>
-<p style="font-size:.85rem;color:#666">Computed from the full dataset. Subscribers get this per-week, per-service, per-impact-level.</p>
-<h2>Get early access</h2>
-<p>Get the full dataset:</p>
-<p style="display:flex;gap:.6rem;flex-wrap:wrap">
-<a href="https://buy.stripe.com/9B6eVe0wp7eGaVc1bT8og00" style="display:inline-block;padding:.65rem 1rem;background:#0a7;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">Subscribe — $5/month</a>
-<a href="https://buy.stripe.com/bJe5kE4MF2Yq2oG2fX8og01" style="display:inline-block;padding:.65rem 1rem;background:#075;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">Founding member — $3/month</a>
-</p>
-<p style="font-size:.85rem;color:#666">Your purchase includes the current CSV/SQLite dataset. Updated subscriber delivery and API access are being rolled out as the service expands.</p>
-<form action="https://formsubmit.co/statusfeed.dev@gmail.com" method="POST" style="display:flex;gap:.5rem;max-width:420px">
-<input type="email" name="email" placeholder="you@example.com" required style="flex:1;padding:.5rem;border:1px solid #ccc;border-radius:6px">
-<button type="submit" style="padding:.5rem 1rem;background:#0a7;color:#fff;border:0;border-radius:6px;cursor:pointer">Join waitlist</button>
-</form>
-<p style="font-size:.8rem;color:#666">Built autonomously by an AI ops agent 🤖</p>
-</body></html>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Continuously refreshed, queryable incident history from official cloud-provider status pages.">
+<title>StatusPulse — incident history and vendor reliability data</title>
+<style>
+body{font-family:system-ui,-apple-system,sans-serif;max-width:1100px;margin:2rem auto;padding:0 1rem;color:#17202a;line-height:1.45}
+h1 span{color:#087f5b} h2{margin-top:2rem} a{color:#0866c6} .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.8rem}
+.card{border:1px solid #d9e2e8;border-radius:10px;padding:1rem;background:#fbfdfd} .big{font-size:1.7rem;font-weight:700}
+table{border-collapse:collapse;width:100%;font-size:.9rem}td,th{padding:.55rem .6rem;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
+.status{border-radius:999px;padding:.15rem .5rem;background:#eef2f4;font-size:.8rem}.resolved{color:#087f5b;background:#d3f9d8}.investigating,.identified{color:#9a3412;background:#ffedd5}
+.cta{background:#e6fcf5;border:1px solid #96f2d7;border-radius:10px;padding:1rem}small{color:#59636e}
+</style></head><body>
+<h1>Status<span>Pulse</span></h1>
+<p><strong>Evidence for vendor reliability reviews.</strong> StatusPulse preserves official incident timelines across 8 infrastructure providers in queryable CSV/SQLite form. It is a historical dataset, not synthetic monitoring or an uptime guarantee.</p>
+<div class="grid"><div class="card"><div class="big">389</div>Total incidents</div><div class="card"><div class="big">170</div>Started in 30 days</div><div class="card"><div class="big">9</div>Currently unresolved</div><div class="card"><div class="big">8</div>Official sources</div></div>
+<p><small>Last generated 2026-08-23 18:05 UTC. Sources: atlassian, cloudflare, datadog, digitalocean, github, supabase, twilio, vercel. Recent impact mix: critical: 7 · maintenance: 1 · major: 12 · minor: 131 · none: 19.</small></p>
+<h2>Recent incident timeline</h2><p>Use this view to investigate recurring vendor failures, compare incident impact, and retain evidence beyond a provider's dashboard history.</p>
+<table><tr><th>Provider</th><th>Incident</th><th>Status</th><th>Impact</th><th>Started</th></tr><tr><td>digitalocean</td><td>Managed Databases Creation</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-23 05:11:37</td></tr>
+<tr><td>cloudflare</td><td>Elevated network errors for traffic routed between North America origins and SIN (Singapore) colo</td><td><span class="status resolved">resolved</span></td><td>none</td><td>2026-08-23 02:00:00</td></tr>
+<tr><td>twilio</td><td>SMS Delivery Receipt Delays from Twilio to I.C.E Costa Rica</td><td><span class="status identified">identified</span></td><td>minor</td><td>2026-08-22 11:01:44</td></tr>
+<tr><td>twilio</td><td>SMS Delivery Delays from Twilio to Vivacom Bulgaria</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-22 08:20:32</td></tr>
+<tr><td>twilio</td><td>SMS Delivery Failures from Twilio to Dukagjini Kosovo</td><td><span class="status identified">identified</span></td><td>minor</td><td>2026-08-22 07:38:17</td></tr>
+<tr><td>cloudflare</td><td>Network connectivity issues in Dubai (DXB)</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-22 02:31:34</td></tr>
+<tr><td>twilio</td><td>SMS Delivery Delays from Twilio to Mobile Oman</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-21 22:15:25</td></tr>
+<tr><td>twilio</td><td>SMS Delivery Receipt Delays from a Subset of Twilio International Pre-Registered Sender IDs to Vinaphone Vietnam</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-21 20:43:46</td></tr>
+<tr><td>cloudflare</td><td>Zero Trust Client Posture Failures</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-21 20:43:30</td></tr>
+<tr><td>cloudflare</td><td>Network Performance Issues in Asia Pacific Region</td><td><span class="status resolved">resolved</span></td><td>none</td><td>2026-08-21 17:39:20</td></tr>
+<tr><td>cloudflare</td><td>Increased Errors for Durable Objects in the Hong Kong region</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-21 14:59:50</td></tr>
+<tr><td>twilio</td><td>SMS Delivery Delays from Twilio to Viva Dominican Republic</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-21 14:40:38</td></tr>
+<tr><td>twilio</td><td>SMS Delivery Delays from a Subset of Twilio Phone Numbers to Telefonica El Salvador</td><td><span class="status identified">identified</span></td><td>minor</td><td>2026-08-21 14:20:12</td></tr>
+<tr><td>digitalocean</td><td>Container Registry and Spaces Accessibility</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-21 12:59:42</td></tr>
+<tr><td>twilio</td><td>Programmable Messaging API Affected</td><td><span class="status resolved">resolved</span></td><td>none</td><td>2026-08-21 12:44:57</td></tr>
+<tr><td>twilio</td><td>SMS Delivery Delays and Failures from a Subset of Twilio Alphanumeric Sender IDs to Viva Dominican Republic</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-21 12:39:27</td></tr>
+<tr><td>supabase</td><td>Delays in project provisioning</td><td><span class="status resolved">resolved</span></td><td>none</td><td>2026-08-21 10:26:19</td></tr>
+<tr><td>twilio</td><td>SMS Delivery Failures from Twilio to Dukagjini Kosovo</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-21 09:48:41</td></tr>
+<tr><td>twilio</td><td>SMS Delivery Failures from Twilio to Dukagjjni Kosovo</td><td><span class="status investigating">investigating</span></td><td>minor</td><td>2026-08-21 09:15:44</td></tr>
+<tr><td>cloudflare</td><td>Network performance issue in Mumbai</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-21 07:31:30</td></tr>
+<tr><td>cloudflare</td><td>Cloudflare Access Browser-based RDP Issue</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-21 06:40:44</td></tr>
+<tr><td>twilio</td><td>Voice Call Failures Between a Subset of Twilio Phone Numbers and Multiple Networks in Japan</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-21 00:09:04</td></tr>
+<tr><td>cloudflare</td><td>MTLS Validation issues</td><td><span class="status resolved">resolved</span></td><td>none</td><td>2026-08-21 00:05:23</td></tr>
+<tr><td>twilio</td><td>Voice Call Failures Between a Subset of Twilio Phone Numbers and Multiple Networks in Japan</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-20 21:13:55</td></tr>
+<tr><td>twilio</td><td>SMS Delivery Failures from a Subset of Twilio Alphanumeric Sender IDs to Altan Redes Mexico</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-20 20:08:31</td></tr></table>
+<h2>Provider coverage and median resolution time</h2><table><tr><th>Provider</th><th>Incidents captured</th><th>Median resolved duration</th></tr><tr><td>twilio</td><td>53</td><td>4.32 h</td></tr>
+<tr><td>cloudflare</td><td>51</td><td>1.17 h</td></tr>
+<tr><td>digitalocean</td><td>51</td><td>2.48 h</td></tr>
+<tr><td>datadog</td><td>50</td><td>1.53 h</td></tr>
+<tr><td>github</td><td>50</td><td>94.65 h</td></tr>
+<tr><td>supabase</td><td>50</td><td>2.71 h</td></tr>
+<tr><td>vercel</td><td>50</td><td>1.02 h</td></tr>
+<tr><td>atlassian</td><td>34</td><td>2.01 h</td></tr></table>
+<div class="cta"><h2>Download or subscribe</h2><p><a href="statuspulse-sample.csv" download>Download the current 100-row CSV sample</a> · <a href="https://github.com/statusfeed-dev/statuspulse-export">Use the free CLI exporter</a></p><p>The paid release includes the current full CSV/SQLite dataset for SRE, platform, vendor-management, and reliability-research workflows.</p><p><a href="https://buy.stripe.com/9B6eVe0wp7eGaVc1bT8og00">Subscribe — $5/month</a> · <a href="https://buy.stripe.com/bJe5kE4MF2Yq2oG2fX8og01">Founding member — $3/month</a></p><small>Initial subscribers receive the current release. Automated subscriber delivery is being connected; do not rely on this page as an API endpoint.</small></div>
+<p><small>Collected from official public Statuspage API endpoints with source provenance. Built by statusfeed-dev.</small></p></body></html>
