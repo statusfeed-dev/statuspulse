@@ -1,11 +1,14 @@
 {
-  "total": 387,
-  "last30d": 387,
+  "total": 389,
+  "last30d": 170,
+  "coverage_start": "2019-05-07T09:45:37.229Z",
+  "coverage_end": "2026-08-23T05:11:37.000Z",
+  "computed_at": "2026-08-23T18:04:13.941936+00:00",
   "by_source": {
     "atlassian": 34,
-    "cloudflare": 50,
+    "cloudflare": 51,
     "datadog": 50,
-    "digitalocean": 50,
+    "digitalocean": 51,
     "github": 50,
     "supabase": 50,
     "twilio": 53,
