@@ -1,0 +1,5 @@
+# Local operations and credentials
+ops.db
+__pycache__/
+*.pyc
+# Collector database is intentionally tracked for the static data release
