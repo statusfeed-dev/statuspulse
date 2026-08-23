@@ -33,9 +33,22 @@ This is historical incident data, not synthetic monitoring, an uptime guarantee,
 - Standard: https://buy.stripe.com/9B6eVe0wp7eGaVc1bT8og00
 - Founding member: https://buy.stripe.com/bJe5kE4MF2Yq2oG2fX8og01
 
-## Fulfillment note
+## Fulfillment implementation
 
-Until webhook-backed entitlement and delivery are deployed, fulfill a successful subscription manually with the current CSV/SQLite release. Do not promise automatic hourly delivery. Never place Stripe secret or webhook keys in this repository.
+`fulfillment.py` implements the deployable fulfillment boundary. It verifies Stripe webhook signatures with a five-minute tolerance, rejects live-mode fixture events during local/test use, processes events idempotently, grants access only for paid subscription checkouts, revokes canceled subscriptions, and protects both full-dataset formats behind an expiring authenticated session.
+
+## Manual production steps
+
+No Stripe resources or deployments are created by this repository. Before production, an operator must:
+
+1. Deploy `fulfillment.py` behind HTTPS with persistent storage for `ops.db` and read access to the refreshed `statusfeed.db`.
+2. Set `STRIPE_WEBHOOK_SECRET` in the platform secret manager (never `.env` or source control). Optionally set `STATUSPULSE_OPS_DB`, `STATUSPULSE_DATASET_DB`, and `PORT`.
+3. In Stripe, set each Checkout/Payment Link success redirect to `https://YOUR_FULFILLMENT_HOST/checkout/success?session_id={CHECKOUT_SESSION_ID}`.
+4. Create a Stripe webhook endpoint at `https://YOUR_FULFILLMENT_HOST/stripe/webhook` for `checkout.session.completed` and `customer.subscription.deleted`, then place its signing secret in the platform secret manager.
+5. First repeat the complete flow in Stripe test mode. Confirm an unpaid or invalidly signed event grants nothing, a paid subscription enables both downloads, replaying the event changes nothing, and cancellation revokes access.
+6. Only after the test flow passes, explicitly set `STATUSPULSE_ALLOW_LIVE=true` in the production secret/configuration manager. Rotate the production signing secret if it is ever exposed, and configure backups/retention for the minimal operations database.
+
+The current implementation deliberately does not create Stripe customers, prices, charges, webhooks, or deployments and does not send email. Checkout's success redirect is the delivery path.
 
 ## Refund/support policy draft
 

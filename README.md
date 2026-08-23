@@ -23,7 +23,24 @@ The paid release is a current downloadable CSV + SQLite snapshot covering offici
 - Standard: **$5/month** — [subscribe](https://buy.stripe.com/9B6eVe0wp7eGaVc1bT8og00)
 - Founding member: **$3/month** — [subscribe](https://buy.stripe.com/bJe5kE4MF2Yq2oG2fX8og01)
 
-The initial subscriber delivery is the current release. Automated subscriber delivery is being connected; this static site is not an API endpoint.
+The fulfillment service in `fulfillment.py` grants authenticated, 24-hour access to the current release after a verified Stripe Checkout webhook. The static preview itself is not an API endpoint.
+
+## Paid fulfillment service
+
+The service uses only the Python standard library. A valid test-mode `checkout.session.completed` webhook for a paid subscription creates an entitlement. Stripe Checkout must redirect to:
+
+`https://YOUR_FULFILLMENT_HOST/checkout/success?session_id={CHECKOUT_SESSION_ID}`
+
+That redirect exchanges the non-guessable Checkout Session ID for a random, expiring, `Secure`/`HttpOnly` cookie. The CSV is generated from the current `statusfeed.db`; the SQLite download returns that same current database. Both download endpoints re-check the active entitlement. A `customer.subscription.deleted` event revokes it. The local operations database stores only Stripe event IDs, Checkout Session IDs, subscription IDs, active state, timestamps, and hashes of access tokens—no customer, payment, or card data.
+
+Local test setup (fixture values only):
+
+```bash
+python3 -m unittest -v
+STRIPE_WEBHOOK_SECRET=fixture_signing_secret PORT=8000 python3 fulfillment.py
+```
+
+Do not put secrets in `.env`, source control, command output, or client-side code. Supply production secrets through the hosting platform's secret manager. See [stripe-listing.md](stripe-listing.md) for the production checklist.
 
 ## Files
 
@@ -32,6 +49,8 @@ The initial subscriber delivery is the current release. Automated subscriber del
 - `collect.py` — hourly collector using official public status APIs only
 - `generate_site.py` — regenerates the page and sample from the local DB
 - `statuspulse-export.py` — free CLI lead magnet
+- `fulfillment.py` — signed webhook processing, entitlements, authentication, and downloads
+- `test_fulfillment.py` — fulfillment security and download tests
 - `stripe-listing.md` — product copy and fulfillment boundary
 
 ## Data schema
