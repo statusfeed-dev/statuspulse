@@ -18,12 +18,14 @@ python3 statuspulse-export.py https://www.githubstatus.com 30 incidents.csv
 
 ## Paid release
 
-The paid release is a current downloadable CSV + SQLite snapshot covering official incident timelines from GitHub, Cloudflare, Datadog, Vercel, Supabase, Twilio, Atlassian, and DigitalOcean.
+The paid release is a current downloadable CSV + SQLite snapshot covering official incident timelines from GitHub, Cloudflare, Datadog, Vercel, Supabase, Twilio, Atlassian, DigitalOcean, OpenAI, Google Cloud, and AWS.
 
 - Standard: **$5/month** — [subscribe](https://buy.stripe.com/9B6eVe0wp7eGaVc1bT8og00)
 - Founding member: **$3/month** — [subscribe](https://buy.stripe.com/bJe5kE4MF2Yq2oG2fX8og01)
 
 The initial subscriber delivery is the current release. Automated subscriber delivery is being connected; this static site is not an API endpoint.
+
+Each record includes source URL and collection timestamp. Statuspage records also retain normalized component and update-count details; provider-specific records retain additional raw public metadata in `details`. AWS/Azure/GCP/OpenAI coverage may have different public-history windows and schemas, so compare only with the stated source and coverage metadata.
 
 ## Files
 

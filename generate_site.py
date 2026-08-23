@@ -62,7 +62,7 @@ def main():
     with SAMPLE.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=sample_fields)
         writer.writeheader()
-        writer.writerows(dict(r) for r in rows[:100])
+        writer.writerows({field: r[field] for field in sample_fields} for r in rows[:100])
 
     incident_rows = "\n".join(
         f'<tr><td>{esc(r["source"])}</td><td>{esc(r["name"])}</td><td><span class="status {esc(r["status"])}">{esc(r["status"])}</span></td><td>{esc(r["impact"])}</td><td>{esc((r["started_at"] or "")[:19].replace("T", " "))}</td></tr>'
@@ -95,13 +95,13 @@ table{{border-collapse:collapse;width:100%;font-size:.9rem}}td,th{{padding:.55re
 <table><tr><th>Provider</th><th>Incident</th><th>Status</th><th>Impact</th><th>Started</th></tr>{incident_rows}</table>
 <h2>Provider coverage and median resolution time</h2><table><tr><th>Provider</th><th>Incidents captured</th><th>Median resolved duration</th></tr>{score_rows}</table>
 <div class="cta"><h2>Download or subscribe</h2><p><a href="statuspulse-sample.csv" download>Download the current 100-row CSV sample</a> · <a href="https://github.com/statusfeed-dev/statuspulse-export">Use the free CLI exporter</a></p><p>The paid release includes the current full CSV/SQLite dataset for SRE, platform, vendor-management, and reliability-research workflows.</p><p><a href="{LINK_STANDARD}">Subscribe — $5/month</a> · <a href="{LINK_FOUNDING}">Founding member — $3/month</a></p><small>Initial subscribers receive the current release. Automated subscriber delivery is being connected; do not rely on this page as an API endpoint.</small></div>
-<p><small>Collected from official public Statuspage API endpoints with source provenance. Built by statusfeed-dev.</small></p></body></html>'''
+<p><small>Collected from official public status APIs with source URLs, timestamps, and normalized incident details. Sources: {esc(source_list)}. Built by statusfeed-dev.</small></p></body></html>'''
     OUT.write_text(page, encoding="utf-8")
     stats = {
         "total": len(rows),
         "last30d": len(recent),
-        "coverage_start": min((r["started_at"] for r in rows), default=None),
-        "coverage_end": max((r["started_at"] for r in rows), default=None),
+        "coverage_start": min((r["started_at"] for r in rows if r["started_at"]), default=None),
+        "coverage_end": max((r["started_at"] for r in rows if r["started_at"]), default=None),
         "computed_at": now.isoformat(),
         "by_source": provider_counts,
         "unresolved": len(unresolved),
