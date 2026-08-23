@@ -1,9 +1,15 @@
 {
- "total": 100,
- "last30d": 79,
- "by_source": {
-  "cloudflare": 50,
-  "github": 50
- },
- "unresolved": 0
+  "total": 387,
+  "last30d": 387,
+  "by_source": {
+    "atlassian": 34,
+    "cloudflare": 50,
+    "datadog": 50,
+    "digitalocean": 50,
+    "github": 50,
+    "supabase": 50,
+    "twilio": 53,
+    "vercel": 50
+  },
+  "unresolved": 9
 }
