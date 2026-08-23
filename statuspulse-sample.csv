@@ -1,101 +1,101 @@
 id,source,name,status,impact,started_at,resolved_at,fetched_at
-2gt97flg6pg9,twilio,SMS Delivery Receipt Delays from Twilio to I.C.E Costa Rica,identified,minor,2026-08-22T11:01:44.026-07:00,,2026-08-23T01:34:30.426978
-kld3sb19sdhj,twilio,SMS Delivery Delays from Twilio to Vivacom Bulgaria,resolved,minor,2026-08-22T08:20:32.943-07:00,2026-08-22T12:55:50.931-07:00,2026-08-23T01:34:30.426978
-k4f2dk5v0ldm,twilio,SMS Delivery Failures from Twilio to Dukagjini Kosovo,identified,minor,2026-08-22T07:38:17.611-07:00,,2026-08-23T01:34:30.426978
-xdzz2t911t1w,cloudflare,Network connectivity issues in Dubai (DXB),resolved,minor,2026-08-22T02:31:34.000Z,2026-08-22T02:57:56.480Z,2026-08-23T01:34:30.426978
-9n0v2370n3gg,twilio,SMS Delivery Delays from Twilio to Mobile Oman,resolved,minor,2026-08-21T22:15:25.032-07:00,2026-08-22T01:31:55.660-07:00,2026-08-23T01:34:30.426978
-9m158lwkpd6z,twilio,SMS Delivery Receipt Delays from a Subset of Twilio International Pre-Registered Sender IDs to Vinaphone Vietnam,resolved,minor,2026-08-21T20:43:46.913-07:00,2026-08-22T00:07:27.980-07:00,2026-08-23T01:34:30.426978
-mts6889b2wcx,cloudflare,Zero Trust Client Posture Failures,resolved,minor,2026-08-21T20:43:30.123Z,2026-08-21T21:33:58.790Z,2026-08-23T01:34:30.426978
-xl112dfsfz6q,cloudflare,Network Performance Issues in Asia Pacific Region,resolved,none,2026-08-21T17:39:20.000Z,2026-08-21T19:39:57.951Z,2026-08-23T01:34:30.426978
-14kntn62njng,cloudflare,Increased Errors for Durable Objects in the Hong Kong region,resolved,minor,2026-08-21T14:59:50.689Z,2026-08-21T15:19:56.036Z,2026-08-23T01:34:30.426978
-8j1s3d6l5zyn,twilio,SMS Delivery Delays from Twilio to Viva Dominican Republic,resolved,minor,2026-08-21T14:40:38.497-07:00,2026-08-21T15:00:49.306-07:00,2026-08-23T01:34:30.426978
-16s1650c3kxf,twilio,SMS Delivery Delays from a Subset of Twilio Phone Numbers to Telefonica El Salvador,identified,minor,2026-08-21T14:20:12.706-07:00,,2026-08-23T01:34:30.426978
-s0dyq97c5v72,digitalocean,Container Registry and Spaces Accessibility,resolved,minor,2026-08-21T12:59:42.681Z,2026-08-21T14:52:40.373Z,2026-08-23T01:34:30.426978
-tg9jb3982kw9,twilio,Programmable Messaging API Affected,resolved,none,2026-08-21T12:44:57.611-07:00,2026-08-21T12:44:57.666-07:00,2026-08-23T01:34:30.426978
-4xc060jmvmzc,twilio,SMS Delivery Delays and Failures from a Subset of Twilio Alphanumeric Sender IDs to Viva Dominican Republic,resolved,minor,2026-08-21T12:39:27.251-07:00,2026-08-21T22:40:21.336-07:00,2026-08-23T01:34:30.426978
-lpyc4sbm44cz,supabase,Delays in project provisioning,resolved,none,2026-08-21T10:26:19.309Z,2026-08-21T12:15:15.093Z,2026-08-23T01:34:30.426978
-1p0389r8f5f2,twilio,SMS Delivery Failures from Twilio to Dukagjini Kosovo,resolved,minor,2026-08-21T09:48:41.155-07:00,2026-08-21T20:13:37.999-07:00,2026-08-23T01:34:30.426978
-06l7ygn0yv6k,twilio,SMS Delivery Failures from Twilio to Dukagjjni Kosovo,investigating,minor,2026-08-21T09:15:44.872-07:00,,2026-08-23T01:34:30.426978
-fwvfd2zzbvg8,cloudflare,Network performance issue in Mumbai,resolved,minor,2026-08-21T07:31:30.930Z,2026-08-21T07:45:56.214Z,2026-08-23T01:34:30.426978
-k6v45x988py7,cloudflare,Cloudflare Access Browser-based RDP Issue,resolved,minor,2026-08-21T06:40:44.093Z,2026-08-21T08:22:29.569Z,2026-08-23T01:34:30.426978
-b6kcz5pplnqf,twilio,Voice Call Failures Between a Subset of Twilio Phone Numbers and Multiple Networks in Japan,resolved,minor,2026-08-21T00:09:04.947-07:00,2026-08-21T03:04:07.988-07:00,2026-08-23T01:34:30.426978
-jzv93gkq85bj,cloudflare,MTLS Validation issues,resolved,none,2026-08-21T00:05:23.393Z,2026-08-21T00:13:54.635Z,2026-08-23T01:34:30.426978
-s9c1b0qkwy76,twilio,Voice Call Failures Between a Subset of Twilio Phone Numbers and Multiple Networks in Japan,resolved,minor,2026-08-20T21:13:55.579-07:00,2026-08-20T21:50:17.722-07:00,2026-08-23T01:34:30.426978
-ycwwhtldf84g,twilio,SMS Delivery Failures from a Subset of Twilio Alphanumeric Sender IDs to Altan Redes Mexico,resolved,minor,2026-08-20T20:08:31.153-07:00,2026-08-21T00:27:27.757-07:00,2026-08-23T01:34:30.426978
-jn37dmb9s37p,cloudflare,Missing R2 Audit Logs,resolved,none,2026-08-20T19:19:19.789Z,2026-08-20T22:59:33.508Z,2026-08-23T01:34:30.426978
-rq2nwg85qqn4,cloudflare,Elevated Errors R2 and Durable Objects,resolved,minor,2026-08-20T18:51:08.474Z,2026-08-20T19:32:37.615Z,2026-08-23T01:34:30.426978
-w8r0qkm97p1c,vercel,New container functions are failing,resolved,major,2026-08-20T17:46:33.302Z,2026-08-20T18:34:00.715Z,2026-08-23T01:34:30.426978
-f35vbpr3dv4h,cloudflare,Durable Objects and Downstream Service Errors,resolved,minor,2026-08-20T16:48:25.439Z,2026-08-20T17:48:08.512Z,2026-08-23T01:34:30.426978
-bhbcjn4n3jzp,github,Intermittent failures creating agent tasks,resolved,critical,2026-08-20T14:43:01.526Z,2026-08-21T00:37:20.224Z,2026-08-23T01:34:30.426978
-76jq00tfhd4c,cloudflare,Increased Errors for Durable Objects and Downstream Services in Indonesia,resolved,minor,2026-08-20T13:10:35.000Z,2026-08-20T14:00:10.932Z,2026-08-23T01:34:30.426978
-xh5t9jy2cl6x,cloudflare,Network Performance Issues in India,resolved,minor,2026-08-20T11:38:10.411Z,2026-08-20T15:14:12.519Z,2026-08-23T01:34:30.426978
-g5svdyg45c5b,vercel,Logs unavailable to query in Dashboard,resolved,major,2026-08-20T11:14:32.021Z,2026-08-20T11:25:37.472Z,2026-08-23T01:34:30.426978
-0hy39wn87nrg,twilio,Voice Call Post Dial Delay from Twilio Phone Numbers to Mexico,resolved,minor,2026-08-20T10:38:27.062-07:00,2026-08-20T13:04:21.736-07:00,2026-08-23T01:34:30.426978
-yn99vxky9dnw,twilio,Elastic SIP Trunking Link Not Available in Console Sidebar,resolved,none,2026-08-20T09:10:38.883-07:00,2026-08-20T09:10:38.937-07:00,2026-08-23T01:34:30.426978
-5g1nlg4hc2lh,cloudflare,Network performance issue in Singapore,resolved,minor,2026-08-20T05:41:51.723Z,2026-08-20T05:58:05.134Z,2026-08-23T01:34:30.426978
-4c50l37zsblh,twilio,SMS Delivery Delays From a Subset of Twilio Short Codes to T-Mobile United States,resolved,minor,2026-08-20T05:32:41.191-07:00,2026-08-20T09:07:53.332-07:00,2026-08-23T01:34:30.426978
-877bn0l3ptp8,cloudflare,Elevated error rates in Chicago (ORD) region.,resolved,minor,2026-08-19T21:19:49.145Z,2026-08-19T23:23:29.961Z,2026-08-23T01:34:30.426978
-46j9vvprj159,cloudflare,Workers AI GLM 5.2 is unavailable,resolved,minor,2026-08-19T16:15:29.836Z,2026-08-19T17:24:19.550Z,2026-08-23T01:34:30.426978
-swgfk4tv1rvs,supabase,Network access issues affecting a limited number of users in Myanmar,identified,none,2026-08-19T15:52:31.142Z,,2026-08-23T01:34:30.426978
-yrhdbmp3g0h6,twilio,Event Streams Delivery Stopped,resolved,major,2026-08-19T15:45:27.444-07:00,2026-08-19T18:02:32.110-07:00,2026-08-23T01:34:30.426978
-3gm14w22gjmp,twilio,Increased Latency and Failures on Porting APIs,resolved,minor,2026-08-19T13:38:55.553-07:00,2026-08-19T17:58:27.206-07:00,2026-08-23T01:34:30.426978
-zb996y1d911h,twilio,MMS Delivery Delays from a Subset of Twilio Long Codes to Multiple Networks in United States,resolved,minor,2026-08-19T13:34:01.960-07:00,2026-08-19T20:13:19.806-07:00,2026-08-23T01:34:30.426978
-1kzddpb0fhwr,supabase,Sign-in failures for `signInWithIdToken` (OIDC) logins on free-tier projects,resolved,minor,2026-08-19T12:47:10.801Z,2026-08-19T15:56:16.825Z,2026-08-23T01:34:30.426978
-3p49szv616dh,twilio,SMS Delivery Delays from Twilio to T-Mobile Germany,resolved,minor,2026-08-19T12:36:07.517-07:00,2026-08-19T14:57:33.804-07:00,2026-08-23T01:34:30.426978
-qd8v4wddyqjr,digitalocean,Major Service Interruption in MKC1,resolved,critical,2026-08-19T11:10:06.316Z,2026-08-19T19:34:54.136Z,2026-08-23T01:34:30.426978
-qdbh3n7mf54f,twilio,Caller ID Name Failures,resolved,minor,2026-08-19T10:09:34.876-07:00,2026-08-19T12:41:08.581-07:00,2026-08-23T01:34:30.426978
-xdwbtz278bcq,twilio,IncomingPhoneNumbers API Failures,resolved,minor,2026-08-19T07:42:10.000-07:00,2026-08-19T09:58:35.736-07:00,2026-08-23T01:34:30.426978
-mlr8smgngv5h,cloudflare,Increased Errors for Durable Objects in the Hong Kong region,resolved,minor,2026-08-19T06:59:19.883Z,2026-08-19T07:20:23.527Z,2026-08-23T01:34:30.426978
-kx8r1lyb54rk,twilio,SMS Delivery Failures from a Subset of Twilio Long Codes to Bell Aliant Canada,resolved,minor,2026-08-19T02:40:14.195-07:00,2026-08-19T07:48:40.898-07:00,2026-08-23T01:34:30.426978
-nszcgmml282f,twilio,SMS Delivery Delays from Twilio to Telenet BidCo NV and Base Networks in Belgium,resolved,minor,2026-08-19T00:50:43.638-07:00,2026-08-19T05:43:19.051-07:00,2026-08-23T01:34:30.426978
-ybx6km0j1gwk,vercel,Elevated errors for Workflow streams,resolved,none,2026-08-19T00:28:30.646Z,2026-08-19T00:28:30.708Z,2026-08-23T01:34:30.426978
-0wdtd1c0g2wk,twilio,SMS Delivery Receipt Delays from Twilio to Telecall Brazil,resolved,minor,2026-08-18T23:08:01.626-07:00,2026-08-19T12:40:58.695-07:00,2026-08-23T01:34:30.426978
-pqcnjfxrycb2,cloudflare,CDNJS Elevated Errors,resolved,none,2026-08-18T16:16:42.924Z,2026-08-18T16:34:54.405Z,2026-08-23T01:34:30.426978
-rqrnh37q9mrn,twilio,MMS Delivery Delays from a Subset of Twilio Long Codes to C-Spire United States,resolved,minor,2026-08-18T13:09:19.318-07:00,2026-08-18T19:30:51.524-07:00,2026-08-23T01:34:30.426978
-b85f0px6zy0g,twilio,Flex login errors with SSOv2,resolved,minor,2026-08-18T11:28:40.000-07:00,2026-08-18T14:00:07.273-07:00,2026-08-23T01:34:30.426978
-d9vclzn8pd1h,twilio,1Console Login Unavailable,resolved,minor,2026-08-18T10:13:27.454-07:00,2026-08-18T13:34:03.656-07:00,2026-08-23T01:34:30.426978
-gx7js8bd0jpz,github,Incident with Actions,resolved,major,2026-08-18T09:36:40.316Z,2026-08-21T22:46:26.183Z,2026-08-23T01:34:30.426978
-z0kvxg6gdshm,twilio,Voice Call Failures from T-Mobile United States to a Subset of Twilio United States Phone Numbers,resolved,minor,2026-08-18T07:56:29.977-07:00,2026-08-18T09:35:03.916-07:00,2026-08-23T01:34:30.426978
-bmpybhnrky3x,github,Intermittent failures in runner group and runner-related permissions pages,resolved,minor,2026-08-18T07:40:35.670Z,2026-08-21T22:46:06.999Z,2026-08-23T01:34:30.426978
-mfwbn43gdtxg,twilio,SMS Delivery Delays and Failures from Twilio Phone Numbers to Claro Brazil,resolved,minor,2026-08-18T07:30:36.730-07:00,2026-08-18T15:14:13.949-07:00,2026-08-23T01:34:30.426978
-l2s8pphj1036,twilio,SMS Delivery Failures from Twilio to Lycamobile United Kingdom,resolved,minor,2026-08-18T03:14:19.845-07:00,2026-08-18T09:02:59.103-07:00,2026-08-23T01:34:30.426978
-wdp9xb0250qk,cloudflare,Lists Service Degraded,resolved,minor,2026-08-17T19:56:52.016Z,2026-08-17T22:41:47.937Z,2026-08-23T01:34:30.426978
-f8ms50xkfn4t,cloudflare,"Network Performance Issues in Phoenix, Los Angeles",resolved,minor,2026-08-17T19:34:15.402Z,2026-08-17T20:44:32.240Z,2026-08-23T01:34:30.426978
-1s3rcx7r2xhw,twilio,SMS Delivery Delays from Twilio to Free Caraibe France,resolved,minor,2026-08-17T17:33:43.418-07:00,2026-08-18T12:49:46.245-07:00,2026-08-23T01:34:30.426978
-p19kmglclwy4,cloudflare,Cloudflare Dashboard Issues,resolved,minor,2026-08-17T17:26:26.342Z,2026-08-17T19:25:39.299Z,2026-08-23T01:34:30.426978
-rpc6rktpsbmg,twilio,Minority of Delivery Receipts Lost for Conversations Messages,resolved,none,2026-08-17T16:03:44.293-07:00,2026-08-17T16:03:44.370-07:00,2026-08-23T01:34:30.426978
-0870zz5tsljr,twilio,Elevated Rate of Http 503s When Sending Messages Using the Programmable Messaging Api,resolved,minor,2026-08-17T14:57:33.205-07:00,2026-08-17T15:07:22.669-07:00,2026-08-23T01:34:30.426978
-nxvrk1jk0zyb,vercel,"Partial disruption of Observability, Analytics, Firewall, Usage, and Login in Dashboard",resolved,minor,2026-08-17T14:30:28.000Z,2026-08-17T21:25:26.163Z,2026-08-23T01:34:30.426978
-gg1jt8yrgt0x,twilio,Voice Call Audio Quality Degradation from a Subset of Twilio Phone Numbers to Turkey,resolved,minor,2026-08-17T14:26:55.516-07:00,2026-08-17T23:06:11.938-07:00,2026-08-23T01:34:30.426978
-zkxwbgr0cnmx,github,Incident with GitHub.com,resolved,critical,2026-08-17T13:40:03.620Z,2026-08-18T19:21:36.545Z,2026-08-23T01:34:30.426978
-tvm7zw3kf65d,twilio,User Authentication Identity SNA Failure Increase for AT&T in United States,resolved,minor,2026-08-17T11:54:23.068-07:00,2026-08-17T15:34:23.776-07:00,2026-08-23T01:34:30.426978
-2hxsrlmxlf5h,cloudflare,Cloudflare Lists Bulk Actions failing,resolved,minor,2026-08-17T11:52:25.758Z,2026-08-17T12:29:28.738Z,2026-08-23T01:34:30.426978
-w1d9976ls02m,cloudflare,Increased Errors for Durable Objects,resolved,minor,2026-08-17T07:47:04.691Z,2026-08-17T08:58:06.369Z,2026-08-23T01:34:30.426978
-lcvdjp43cr6b,twilio,Delay with transcript availability in Twilio Console,resolved,minor,2026-08-17T07:32:49.474-07:00,2026-08-17T10:37:06.329-07:00,2026-08-23T01:34:30.426978
-xt68sd7mb8kw,twilio,SMS Delivery Delays and Failures from Twilio to DiGi Malaysia,resolved,minor,2026-08-17T03:49:45.088-07:00,2026-08-17T10:27:57.629-07:00,2026-08-23T01:34:30.426978
-rd2q17kjw5p2,supabase,Project creation failing in selected regions,resolved,minor,2026-08-17T01:47:24.264Z,2026-08-17T01:56:20.980Z,2026-08-23T01:34:30.426978
-z6x786knqf8j,twilio,SMS Delivery Delays and Failures from a Subset of Twilio Short Codes to Claro Colombia,resolved,minor,2026-08-16T23:24:42.857-07:00,2026-08-17T03:08:06.005-07:00,2026-08-23T01:34:30.426978
-31glr065r4xg,twilio,Voice Call Post Dial Delay from a Subset of Twilio Phone Numbers to Iraq,resolved,minor,2026-08-16T16:36:35.821-07:00,2026-08-18T02:03:31.278-07:00,2026-08-23T01:34:30.426978
-clygbwj54wq0,twilio,Service Disruption: Inbound Voice Calls to France Numbers and Frankfurt Interconnect,resolved,minor,2026-08-16T14:20:31.000-07:00,2026-08-17T22:20:54.184-07:00,2026-08-23T01:34:30.426978
-b28j8n4wph4s,twilio,SMS Delivery Delays from Twilio to Liberty Mobile Puerto Rico,resolved,minor,2026-08-16T12:12:27.349-07:00,2026-08-17T01:31:46.056-07:00,2026-08-23T01:34:30.426978
-r2gvsly2y5ty,twilio,Elevated Microsoft 365 IP Blocks Causing Delivery Failures for Multiple Users,resolved,none,2026-08-15T07:16:43.831-07:00,2026-08-17T06:30:56.523-07:00,2026-08-23T01:34:30.426978
-9mmpcy59szj2,twilio,SMS Delivery Failures from Twilio to Telemat Cel Brazil,resolved,minor,2026-08-15T05:55:16.025-07:00,2026-08-18T06:45:46.288-07:00,2026-08-23T01:34:30.426978
-znm33zx999kp,twilio,SMS Delivery Delays from Twilio to Orange/Soci Madagascar,resolved,minor,2026-08-15T05:35:00.913-07:00,2026-08-16T01:07:23.611-07:00,2026-08-23T01:34:30.426978
-dhw87g42p7md,twilio,SMS Delivery Failures from Twilio to Malitel Mali,resolved,minor,2026-08-15T03:34:22.688-07:00,2026-08-15T14:01:29.228-07:00,2026-08-23T01:34:30.426978
-vfprmt1kwpz9,twilio,SMS Delivery Delays from Twilio to KDDI Corporation Japan,resolved,minor,2026-08-14T23:58:01.770-07:00,2026-08-15T18:18:56.956-07:00,2026-08-23T01:34:30.426978
-00lh8f3zsvlx,twilio,SMS Delivery Failures from Twilio to Multiple Networks in Multiple Countries across the Middle East and Africa,resolved,minor,2026-08-14T20:47:11.616-07:00,2026-08-15T23:10:41.638-07:00,2026-08-23T01:34:30.426978
-kc88n14c8kjg,cloudflare,Durable Objects and Cloudflare Workflows availability drop,resolved,minor,2026-08-14T19:27:56.955Z,2026-08-14T20:05:45.617Z,2026-08-23T01:34:30.426978
-9qty28mt423v,cloudflare,Increased network congestion in the Eastern US,resolved,minor,2026-08-14T15:34:21.619Z,2026-08-14T16:28:22.084Z,2026-08-23T01:34:30.426978
-ysczd6rxyl7z,vercel,Dynamic API routes returned 404 errors for some deployments,resolved,none,2026-08-14T13:08:12.827Z,2026-08-14T13:08:12.887Z,2026-08-23T01:34:30.426978
-ctvf19frbkw4,supabase,"Project access, updating and creation impacted in us-east-2",resolved,critical,2026-08-14T09:31:06.913Z,2026-08-14T10:44:53.034Z,2026-08-23T01:34:30.426978
-jb87g814jw6z,cloudflare,"Increased HTTP 5xx Errors in Kuwait, Bangkok, Jakarta and Dammam",resolved,minor,2026-08-14T04:55:25.375Z,2026-08-14T05:37:17.996Z,2026-08-23T01:34:30.426978
-nx4k855cdhpv,cloudflare,"Network Performance Issues in Querétaro, Mexico",resolved,minor,2026-08-14T02:38:53.947Z,2026-08-14T03:11:23.875Z,2026-08-23T01:34:30.426978
-6q5902p2xd9f,supabase,401 errors due to JWT rejections,identified,minor,2026-08-14T02:23:18.361Z,,2026-08-23T01:34:30.426978
-jxdzyqckdmqb,cloudflare,Increased 503s when making changes to Cloudflare dash and API for Magic Transit and Cloudflare WAN and CF1 Appliance,resolved,minor,2026-08-13T19:51:55.338Z,2026-08-13T21:16:15.219Z,2026-08-23T01:34:30.426978
-f3czlxddtrf1,cloudflare,Increased  errors for Workers KV requests,resolved,minor,2026-08-13T17:31:16.489Z,2026-08-13T17:53:25.517Z,2026-08-23T01:34:30.426978
-br0y58121k86,cloudflare,MCP Server Portal experiencing intermittent issues with user authentication,resolved,minor,2026-08-13T16:49:38.816Z,2026-08-13T17:38:44.193Z,2026-08-23T01:34:30.426978
-pf25whpq58hh,github,Disruption with GHEC Team Sync,resolved,minor,2026-08-13T16:21:33.096Z,2026-08-13T18:27:54.660Z,2026-08-23T01:34:30.426978
-vt86k1gy6cpz,twilio,Voice Call Failures from a Subset of Twilio Phone Numbers to Multiple Networks in Colombia,resolved,minor,2026-08-13T16:19:43.354-07:00,2026-08-15T17:35:54.735-07:00,2026-08-23T01:34:30.426978
-h79v9rn8h6ml,cloudflare,Cloudflare Workers AI errors with Specific models,resolved,minor,2026-08-13T15:00:29.359Z,2026-08-13T16:51:34.848Z,2026-08-23T01:34:30.426978
-y3kn2w2qf5s4,digitalocean,Volume Attach/Detach events in FRA1,resolved,none,2026-08-13T14:59:44.840Z,2026-08-13T14:59:44.895Z,2026-08-23T01:34:30.426978
-k8vbzwqjkxzn,github,Incident with Webhooks,resolved,minor,2026-08-13T14:45:40.422Z,2026-08-13T15:36:34.631Z,2026-08-23T01:34:30.426978
+r96y45y5sx59,digitalocean,Managed Databases Creation,resolved,minor,2026-08-23T05:11:37.000Z,2026-08-23T14:33:31.719Z,2026-08-23T18:02:28.917872
+digitalocean:r96y45y5sx59,digitalocean,Managed Databases Creation,resolved,minor,2026-08-23T05:11:37.000Z,2026-08-23T14:33:31.719Z,2026-08-23T18:46:07.327602+00:00
+1wwc0f6m1c21,cloudflare,Elevated network errors for traffic routed between North America origins and SIN (Singapore) colo,resolved,none,2026-08-23T02:00:00.000Z,2026-08-23T02:30:06.857Z,2026-08-23T18:02:28.917872
+cloudflare:1wwc0f6m1c21,cloudflare,Elevated network errors for traffic routed between North America origins and SIN (Singapore) colo,resolved,none,2026-08-23T02:00:00.000Z,2026-08-23T02:00:00.000Z,2026-08-23T18:46:07.327602+00:00
+2gt97flg6pg9,twilio,SMS Delivery Receipt Delays from Twilio to I.C.E Costa Rica,identified,minor,2026-08-22T11:01:44.026-07:00,,2026-08-23T18:02:28.917872
+twilio:2gt97flg6pg9,twilio,SMS Delivery Receipt Delays from Twilio to I.C.E Costa Rica,identified,minor,2026-08-22T11:01:44.026-07:00,,2026-08-23T18:46:07.327602+00:00
+kld3sb19sdhj,twilio,SMS Delivery Delays from Twilio to Vivacom Bulgaria,resolved,minor,2026-08-22T08:20:32.943-07:00,2026-08-22T12:55:50.931-07:00,2026-08-23T18:02:28.917872
+twilio:kld3sb19sdhj,twilio,SMS Delivery Delays from Twilio to Vivacom Bulgaria,resolved,minor,2026-08-22T08:20:32.943-07:00,2026-08-22T12:55:50.931-07:00,2026-08-23T18:46:07.327602+00:00
+k4f2dk5v0ldm,twilio,SMS Delivery Failures from Twilio to Dukagjini Kosovo,identified,minor,2026-08-22T07:38:17.611-07:00,,2026-08-23T18:02:28.917872
+twilio:k4f2dk5v0ldm,twilio,SMS Delivery Failures from Twilio to Dukagjini Kosovo,identified,minor,2026-08-22T07:38:17.611-07:00,,2026-08-23T18:46:07.327602+00:00
+xdzz2t911t1w,cloudflare,Network connectivity issues in Dubai (DXB),resolved,minor,2026-08-22T02:31:34.000Z,2026-08-22T02:57:56.480Z,2026-08-23T18:02:28.917872
+cloudflare:xdzz2t911t1w,cloudflare,Network connectivity issues in Dubai (DXB),resolved,minor,2026-08-22T02:31:34.000Z,2026-08-22T02:57:56.480Z,2026-08-23T18:46:07.327602+00:00
+9n0v2370n3gg,twilio,SMS Delivery Delays from Twilio to Mobile Oman,resolved,minor,2026-08-21T22:15:25.032-07:00,2026-08-22T01:31:55.660-07:00,2026-08-23T18:02:28.917872
+twilio:9n0v2370n3gg,twilio,SMS Delivery Delays from Twilio to Mobile Oman,resolved,minor,2026-08-21T22:15:25.032-07:00,2026-08-22T01:31:55.660-07:00,2026-08-23T18:46:07.327602+00:00
+9m158lwkpd6z,twilio,SMS Delivery Receipt Delays from a Subset of Twilio International Pre-Registered Sender IDs to Vinaphone Vietnam,resolved,minor,2026-08-21T20:43:46.913-07:00,2026-08-22T00:07:27.980-07:00,2026-08-23T18:02:28.917872
+twilio:9m158lwkpd6z,twilio,SMS Delivery Receipt Delays from a Subset of Twilio International Pre-Registered Sender IDs to Vinaphone Vietnam,resolved,minor,2026-08-21T20:43:46.913-07:00,2026-08-22T00:07:27.980-07:00,2026-08-23T18:46:07.327602+00:00
+mts6889b2wcx,cloudflare,Zero Trust Client Posture Failures,resolved,minor,2026-08-21T20:43:30.123Z,2026-08-21T21:33:58.790Z,2026-08-23T18:02:28.917872
+cloudflare:mts6889b2wcx,cloudflare,Zero Trust Client Posture Failures,resolved,minor,2026-08-21T20:43:30.123Z,2026-08-21T21:33:58.790Z,2026-08-23T18:46:07.327602+00:00
+xl112dfsfz6q,cloudflare,Network Performance Issues in Asia Pacific Region,resolved,none,2026-08-21T17:39:20.000Z,2026-08-21T19:39:57.951Z,2026-08-23T18:02:28.917872
+cloudflare:xl112dfsfz6q,cloudflare,Network Performance Issues in Asia Pacific Region,resolved,none,2026-08-21T17:39:20.000Z,2026-08-21T19:39:57.951Z,2026-08-23T18:46:07.327602+00:00
+14kntn62njng,cloudflare,Increased Errors for Durable Objects in the Hong Kong region,resolved,minor,2026-08-21T14:59:50.689Z,2026-08-21T15:19:56.036Z,2026-08-23T18:02:28.917872
+cloudflare:14kntn62njng,cloudflare,Increased Errors for Durable Objects in the Hong Kong region,resolved,minor,2026-08-21T14:59:50.689Z,2026-08-21T15:19:56.036Z,2026-08-23T18:46:07.327602+00:00
+8j1s3d6l5zyn,twilio,SMS Delivery Delays from Twilio to Viva Dominican Republic,resolved,minor,2026-08-21T14:40:38.497-07:00,2026-08-21T15:00:49.306-07:00,2026-08-23T18:02:28.917872
+twilio:8j1s3d6l5zyn,twilio,SMS Delivery Delays from Twilio to Viva Dominican Republic,resolved,minor,2026-08-21T14:40:38.497-07:00,2026-08-21T15:00:49.306-07:00,2026-08-23T18:46:07.327602+00:00
+16s1650c3kxf,twilio,SMS Delivery Delays from a Subset of Twilio Phone Numbers to Telefonica El Salvador,identified,minor,2026-08-21T14:20:12.706-07:00,,2026-08-23T18:02:28.917872
+twilio:16s1650c3kxf,twilio,SMS Delivery Delays from a Subset of Twilio Phone Numbers to Telefonica El Salvador,identified,minor,2026-08-21T14:20:12.706-07:00,,2026-08-23T18:46:07.327602+00:00
+s0dyq97c5v72,digitalocean,Container Registry and Spaces Accessibility,resolved,minor,2026-08-21T12:59:42.681Z,2026-08-21T14:52:40.373Z,2026-08-23T18:02:28.917872
+digitalocean:s0dyq97c5v72,digitalocean,Container Registry and Spaces Accessibility,resolved,minor,2026-08-21T12:59:42.681Z,2026-08-21T14:52:40.373Z,2026-08-23T18:46:07.327602+00:00
+tg9jb3982kw9,twilio,Programmable Messaging API Affected,resolved,none,2026-08-21T12:44:57.611-07:00,2026-08-21T12:44:57.666-07:00,2026-08-23T18:02:28.917872
+twilio:tg9jb3982kw9,twilio,Programmable Messaging API Affected,resolved,none,2026-08-21T12:44:57.611-07:00,2026-08-21T12:44:57.666-07:00,2026-08-23T18:46:07.327602+00:00
+4xc060jmvmzc,twilio,SMS Delivery Delays and Failures from a Subset of Twilio Alphanumeric Sender IDs to Viva Dominican Republic,resolved,minor,2026-08-21T12:39:27.251-07:00,2026-08-21T22:40:21.336-07:00,2026-08-23T18:02:28.917872
+twilio:4xc060jmvmzc,twilio,SMS Delivery Delays and Failures from a Subset of Twilio Alphanumeric Sender IDs to Viva Dominican Republic,resolved,minor,2026-08-21T12:39:27.251-07:00,2026-08-21T22:40:21.336-07:00,2026-08-23T18:46:07.327602+00:00
+lpyc4sbm44cz,supabase,Delays in project provisioning,resolved,none,2026-08-21T10:26:19.309Z,2026-08-21T12:15:15.093Z,2026-08-23T18:02:28.917872
+supabase:lpyc4sbm44cz,supabase,Delays in project provisioning,resolved,none,2026-08-21T10:26:19.309Z,2026-08-21T12:15:15.093Z,2026-08-23T18:46:07.327602+00:00
+1p0389r8f5f2,twilio,SMS Delivery Failures from Twilio to Dukagjini Kosovo,resolved,minor,2026-08-21T09:48:41.155-07:00,2026-08-21T20:13:37.999-07:00,2026-08-23T18:02:28.917872
+twilio:1p0389r8f5f2,twilio,SMS Delivery Failures from Twilio to Dukagjini Kosovo,resolved,minor,2026-08-21T09:48:41.155-07:00,2026-08-21T20:13:37.999-07:00,2026-08-23T18:46:07.327602+00:00
+06l7ygn0yv6k,twilio,SMS Delivery Failures from Twilio to Dukagjjni Kosovo,investigating,minor,2026-08-21T09:15:44.872-07:00,,2026-08-23T18:02:28.917872
+twilio:06l7ygn0yv6k,twilio,SMS Delivery Failures from Twilio to Dukagjjni Kosovo,investigating,minor,2026-08-21T09:15:44.872-07:00,,2026-08-23T18:46:07.327602+00:00
+fwvfd2zzbvg8,cloudflare,Network performance issue in Mumbai,resolved,minor,2026-08-21T07:31:30.930Z,2026-08-21T07:45:56.214Z,2026-08-23T18:02:28.917872
+cloudflare:fwvfd2zzbvg8,cloudflare,Network performance issue in Mumbai,resolved,minor,2026-08-21T07:31:30.930Z,2026-08-21T07:45:56.214Z,2026-08-23T18:46:07.327602+00:00
+k6v45x988py7,cloudflare,Cloudflare Access Browser-based RDP Issue,resolved,minor,2026-08-21T06:40:44.093Z,2026-08-21T08:22:29.569Z,2026-08-23T18:02:28.917872
+cloudflare:k6v45x988py7,cloudflare,Cloudflare Access Browser-based RDP Issue,resolved,minor,2026-08-21T06:40:44.093Z,2026-08-21T08:22:29.569Z,2026-08-23T18:46:07.327602+00:00
+b6kcz5pplnqf,twilio,Voice Call Failures Between a Subset of Twilio Phone Numbers and Multiple Networks in Japan,resolved,minor,2026-08-21T00:09:04.947-07:00,2026-08-21T03:04:07.988-07:00,2026-08-23T18:02:28.917872
+twilio:b6kcz5pplnqf,twilio,Voice Call Failures Between a Subset of Twilio Phone Numbers and Multiple Networks in Japan,resolved,minor,2026-08-21T00:09:04.947-07:00,2026-08-21T03:04:07.988-07:00,2026-08-23T18:46:07.327602+00:00
+jzv93gkq85bj,cloudflare,MTLS Validation issues,resolved,none,2026-08-21T00:05:23.393Z,2026-08-21T00:13:54.635Z,2026-08-23T18:02:28.917872
+cloudflare:jzv93gkq85bj,cloudflare,MTLS Validation issues,resolved,none,2026-08-21T00:05:23.393Z,2026-08-21T00:13:54.635Z,2026-08-23T18:46:07.327602+00:00
+s9c1b0qkwy76,twilio,Voice Call Failures Between a Subset of Twilio Phone Numbers and Multiple Networks in Japan,resolved,minor,2026-08-20T21:13:55.579-07:00,2026-08-20T21:50:17.722-07:00,2026-08-23T18:02:28.917872
+twilio:s9c1b0qkwy76,twilio,Voice Call Failures Between a Subset of Twilio Phone Numbers and Multiple Networks in Japan,resolved,minor,2026-08-20T21:13:55.579-07:00,2026-08-20T21:50:17.722-07:00,2026-08-23T18:46:07.327602+00:00
+ycwwhtldf84g,twilio,SMS Delivery Failures from a Subset of Twilio Alphanumeric Sender IDs to Altan Redes Mexico,resolved,minor,2026-08-20T20:08:31.153-07:00,2026-08-21T00:27:27.757-07:00,2026-08-23T18:02:28.917872
+twilio:ycwwhtldf84g,twilio,SMS Delivery Failures from a Subset of Twilio Alphanumeric Sender IDs to Altan Redes Mexico,resolved,minor,2026-08-20T20:08:31.153-07:00,2026-08-21T00:27:27.757-07:00,2026-08-23T18:46:07.327602+00:00
+jn37dmb9s37p,cloudflare,Missing R2 Audit Logs,resolved,none,2026-08-20T19:19:19.789Z,2026-08-20T22:59:33.508Z,2026-08-23T18:02:28.917872
+cloudflare:jn37dmb9s37p,cloudflare,Missing R2 Audit Logs,resolved,none,2026-08-20T19:19:19.789Z,2026-08-20T22:59:33.508Z,2026-08-23T18:46:07.327602+00:00
+rq2nwg85qqn4,cloudflare,Elevated Errors R2 and Durable Objects,resolved,minor,2026-08-20T18:51:08.474Z,2026-08-20T19:32:37.615Z,2026-08-23T18:02:28.917872
+cloudflare:rq2nwg85qqn4,cloudflare,Elevated Errors R2 and Durable Objects,resolved,minor,2026-08-20T18:51:08.474Z,2026-08-20T19:32:37.615Z,2026-08-23T18:46:07.327602+00:00
+w8r0qkm97p1c,vercel,New container functions are failing,resolved,major,2026-08-20T17:46:33.302Z,2026-08-20T18:34:00.715Z,2026-08-23T18:02:28.917872
+vercel:w8r0qkm97p1c,vercel,New container functions are failing,resolved,major,2026-08-20T17:46:33.302Z,2026-08-20T18:34:00.715Z,2026-08-23T18:46:07.327602+00:00
+f35vbpr3dv4h,cloudflare,Durable Objects and Downstream Service Errors,resolved,minor,2026-08-20T16:48:25.439Z,2026-08-20T17:48:08.512Z,2026-08-23T18:02:28.917872
+cloudflare:f35vbpr3dv4h,cloudflare,Durable Objects and Downstream Service Errors,resolved,minor,2026-08-20T16:48:25.439Z,2026-08-20T17:48:08.512Z,2026-08-23T18:46:07.327602+00:00
+gcp:utF3FMFdQfwBzJcGG6vf,google-cloud,"We are investigating an issue where customers may experience timeouts, service degradations, errors, and elevated latencies across multiple products in the us-west1 region.",resolved,major,2026-08-20T15:40:00+00:00,2026-08-20T19:20:00+00:00,2026-08-23T18:46:07.327602+00:00
+bhbcjn4n3jzp,github,Intermittent failures creating agent tasks,resolved,critical,2026-08-20T14:43:01.526Z,2026-08-21T00:37:20.224Z,2026-08-23T18:02:28.917872
+github:bhbcjn4n3jzp,github,Intermittent failures creating agent tasks,resolved,critical,2026-08-20T14:43:01.526Z,2026-08-21T00:37:20.224Z,2026-08-23T18:46:07.327602+00:00
+76jq00tfhd4c,cloudflare,Increased Errors for Durable Objects and Downstream Services in Indonesia,resolved,minor,2026-08-20T13:10:35.000Z,2026-08-20T14:00:10.932Z,2026-08-23T18:02:28.917872
+cloudflare:76jq00tfhd4c,cloudflare,Increased Errors for Durable Objects and Downstream Services in Indonesia,resolved,minor,2026-08-20T13:10:35.000Z,2026-08-20T14:00:10.932Z,2026-08-23T18:46:07.327602+00:00
+xh5t9jy2cl6x,cloudflare,Network Performance Issues in India,resolved,minor,2026-08-20T11:38:10.411Z,2026-08-20T15:14:12.519Z,2026-08-23T18:02:28.917872
+cloudflare:xh5t9jy2cl6x,cloudflare,Network Performance Issues in India,resolved,minor,2026-08-20T11:38:10.411Z,2026-08-20T15:14:12.519Z,2026-08-23T18:46:07.327602+00:00
+g5svdyg45c5b,vercel,Logs unavailable to query in Dashboard,resolved,major,2026-08-20T11:14:32.021Z,2026-08-20T11:25:37.472Z,2026-08-23T18:02:28.917872
+vercel:g5svdyg45c5b,vercel,Logs unavailable to query in Dashboard,resolved,major,2026-08-20T11:14:32.021Z,2026-08-20T11:25:37.472Z,2026-08-23T18:46:07.327602+00:00
+0hy39wn87nrg,twilio,Voice Call Post Dial Delay from Twilio Phone Numbers to Mexico,resolved,minor,2026-08-20T10:38:27.062-07:00,2026-08-20T13:04:21.736-07:00,2026-08-23T18:02:28.917872
+twilio:0hy39wn87nrg,twilio,Voice Call Post Dial Delay from Twilio Phone Numbers to Mexico,resolved,minor,2026-08-20T10:38:27.062-07:00,2026-08-20T13:04:21.736-07:00,2026-08-23T18:46:07.327602+00:00
+yn99vxky9dnw,twilio,Elastic SIP Trunking Link Not Available in Console Sidebar,resolved,none,2026-08-20T09:10:38.883-07:00,2026-08-20T09:10:38.937-07:00,2026-08-23T18:02:28.917872
+twilio:yn99vxky9dnw,twilio,Elastic SIP Trunking Link Not Available in Console Sidebar,resolved,none,2026-08-20T09:10:38.883-07:00,2026-08-15T22:00:00.000-07:00,2026-08-23T18:46:07.327602+00:00
+5g1nlg4hc2lh,cloudflare,Network performance issue in Singapore,resolved,minor,2026-08-20T05:41:51.723Z,2026-08-20T05:58:05.134Z,2026-08-23T18:02:28.917872
+cloudflare:5g1nlg4hc2lh,cloudflare,Network performance issue in Singapore,resolved,minor,2026-08-20T05:41:51.723Z,2026-08-20T05:58:05.134Z,2026-08-23T18:46:07.327602+00:00
+4c50l37zsblh,twilio,SMS Delivery Delays From a Subset of Twilio Short Codes to T-Mobile United States,resolved,minor,2026-08-20T05:32:41.191-07:00,2026-08-20T09:07:53.332-07:00,2026-08-23T18:02:28.917872
+twilio:4c50l37zsblh,twilio,SMS Delivery Delays From a Subset of Twilio Short Codes to T-Mobile United States,resolved,minor,2026-08-20T05:32:41.191-07:00,2026-08-20T09:07:53.332-07:00,2026-08-23T18:46:07.327602+00:00
+877bn0l3ptp8,cloudflare,Elevated error rates in Chicago (ORD) region.,resolved,minor,2026-08-19T21:19:49.145Z,2026-08-19T23:23:29.961Z,2026-08-23T18:02:28.917872
+cloudflare:877bn0l3ptp8,cloudflare,Elevated error rates in Chicago (ORD) region.,resolved,minor,2026-08-19T21:19:49.145Z,2026-08-19T23:23:29.961Z,2026-08-23T18:46:07.327602+00:00
+46j9vvprj159,cloudflare,Workers AI GLM 5.2 is unavailable,resolved,minor,2026-08-19T16:15:29.836Z,2026-08-19T17:24:19.550Z,2026-08-23T18:02:28.917872
+cloudflare:46j9vvprj159,cloudflare,Workers AI GLM 5.2 is unavailable,resolved,minor,2026-08-19T16:15:29.836Z,2026-08-19T17:24:19.550Z,2026-08-23T18:46:07.327602+00:00
+swgfk4tv1rvs,supabase,Network access issues affecting a limited number of users in Myanmar,identified,none,2026-08-19T15:52:31.142Z,,2026-08-23T18:02:28.917872
+supabase:swgfk4tv1rvs,supabase,Network access issues affecting a limited number of users in Myanmar,identified,none,2026-08-19T15:52:31.142Z,,2026-08-23T18:46:07.327602+00:00
+yrhdbmp3g0h6,twilio,Event Streams Delivery Stopped,resolved,major,2026-08-19T15:45:27.444-07:00,2026-08-19T18:02:32.110-07:00,2026-08-23T18:02:28.917872
+twilio:yrhdbmp3g0h6,twilio,Event Streams Delivery Stopped,resolved,major,2026-08-19T15:45:27.444-07:00,2026-08-19T18:02:32.110-07:00,2026-08-23T18:46:07.327602+00:00
+3gm14w22gjmp,twilio,Increased Latency and Failures on Porting APIs,resolved,minor,2026-08-19T13:38:55.553-07:00,2026-08-19T17:58:27.206-07:00,2026-08-23T18:02:28.917872
+twilio:3gm14w22gjmp,twilio,Increased Latency and Failures on Porting APIs,resolved,minor,2026-08-19T13:38:55.553-07:00,2026-08-19T17:58:27.206-07:00,2026-08-23T18:46:07.327602+00:00
+zb996y1d911h,twilio,MMS Delivery Delays from a Subset of Twilio Long Codes to Multiple Networks in United States,resolved,minor,2026-08-19T13:34:01.960-07:00,2026-08-19T20:13:19.806-07:00,2026-08-23T18:02:28.917872
+twilio:zb996y1d911h,twilio,MMS Delivery Delays from a Subset of Twilio Long Codes to Multiple Networks in United States,resolved,minor,2026-08-19T13:34:01.960-07:00,2026-08-19T20:13:19.806-07:00,2026-08-23T18:46:07.327602+00:00
+1kzddpb0fhwr,supabase,Sign-in failures for `signInWithIdToken` (OIDC) logins on free-tier projects,resolved,minor,2026-08-19T12:47:10.801Z,2026-08-19T15:56:16.825Z,2026-08-23T18:02:28.917872
+supabase:1kzddpb0fhwr,supabase,Sign-in failures for `signInWithIdToken` (OIDC) logins on free-tier projects,resolved,minor,2026-08-19T12:47:10.801Z,2026-08-19T15:56:16.825Z,2026-08-23T18:46:07.327602+00:00
+3p49szv616dh,twilio,SMS Delivery Delays from Twilio to T-Mobile Germany,resolved,minor,2026-08-19T12:36:07.517-07:00,2026-08-19T14:57:33.804-07:00,2026-08-23T18:02:28.917872
+twilio:3p49szv616dh,twilio,SMS Delivery Delays from Twilio to T-Mobile Germany,resolved,minor,2026-08-19T12:36:07.517-07:00,2026-08-19T14:57:33.804-07:00,2026-08-23T18:46:07.327602+00:00
+qd8v4wddyqjr,digitalocean,Major Service Interruption in MKC1,resolved,critical,2026-08-19T11:10:06.316Z,2026-08-19T19:34:54.136Z,2026-08-23T18:02:28.917872
+digitalocean:qd8v4wddyqjr,digitalocean,Major Service Interruption in MKC1,resolved,critical,2026-08-19T11:10:06.316Z,2026-08-19T19:34:54.136Z,2026-08-23T18:46:07.327602+00:00
+qdbh3n7mf54f,twilio,Caller ID Name Failures,resolved,minor,2026-08-19T10:09:34.876-07:00,2026-08-19T12:41:08.581-07:00,2026-08-23T18:02:28.917872
+twilio:qdbh3n7mf54f,twilio,Caller ID Name Failures,resolved,minor,2026-08-19T10:09:34.876-07:00,2026-08-19T12:41:08.581-07:00,2026-08-23T18:46:07.327602+00:00
+xdwbtz278bcq,twilio,IncomingPhoneNumbers API Failures,resolved,minor,2026-08-19T07:42:10.000-07:00,2026-08-19T09:58:35.736-07:00,2026-08-23T18:02:28.917872
+twilio:xdwbtz278bcq,twilio,IncomingPhoneNumbers API Failures,resolved,minor,2026-08-19T07:42:10.000-07:00,2026-08-19T09:58:35.736-07:00,2026-08-23T18:46:07.327602+00:00
+mlr8smgngv5h,cloudflare,Increased Errors for Durable Objects in the Hong Kong region,resolved,minor,2026-08-19T06:59:19.883Z,2026-08-19T07:20:23.527Z,2026-08-23T18:02:28.917872
+cloudflare:mlr8smgngv5h,cloudflare,Increased Errors for Durable Objects in the Hong Kong region,resolved,minor,2026-08-19T06:59:19.883Z,2026-08-19T07:20:23.527Z,2026-08-23T18:46:07.327602+00:00
+kx8r1lyb54rk,twilio,SMS Delivery Failures from a Subset of Twilio Long Codes to Bell Aliant Canada,resolved,minor,2026-08-19T02:40:14.195-07:00,2026-08-19T07:48:40.898-07:00,2026-08-23T18:02:28.917872
