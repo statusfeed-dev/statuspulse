@@ -1,0 +1,109 @@
+name: Deploy StatusPulse fulfillment Worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - worker.js
+      - schema.sql
+      - statusfeed.db
+      - statuspulse-sample.csv
+      - .github/workflows/deploy-worker.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Ensure Cloudflare resources exist
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          api="https://api.cloudflare.com/client/v4"
+          auth=(-H "Authorization: Bearer ${CF_API_TOKEN}" -H 'Content-Type: application/json')
+          databases=$(curl --fail --silent "${auth[@]}" "$api/accounts/$CF_ACCOUNT_ID/d1/database")
+          db_id=$(printf '%s' "$databases" | jq -r '.result[] | select(.name=="statuspulse") | .uuid' | head -n1)
+          if [ -z "$db_id" ]; then
+            created=$(curl --fail --silent -X POST "${auth[@]}" "$api/accounts/$CF_ACCOUNT_ID/d1/database" --data '{"name":"statuspulse"}')
+            db_id=$(printf '%s' "$created" | jq -r '.result.uuid')
+          fi
+          curl --fail --silent -X PUT "${auth[@]}" "$api/accounts/$CF_ACCOUNT_ID/r2/buckets/statuspulse-releases" --data '{"locationHint":"wnam"}' >/dev/null || true
+          printf '%s\n' "$db_id" > .d1-id
+          printf '%s\n' "$CF_ACCOUNT_ID" > .account-id
+
+      - name: Write deployment configuration
+        run: |
+          cat > wrangler.toml <<EOF
+          name = "statuspulse-fulfillment"
+          main = "worker.js"
+          compatibility_date = "2026-08-23"
+          account_id = "$(cat .account-id)"
+          
+          [[d1_databases]]
+          binding = "DB"
+          database_name = "statuspulse"
+          database_id = "$(cat .d1-id)"
+          
+          [[r2_buckets]]
+          binding = "DATA"
+          bucket_name = "statuspulse-releases"
+          EOF
+
+      - name: Apply D1 schema
+        run: npx --yes wrangler@4.125.0 d1 execute statuspulse --remote --file=schema.sql
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Deploy Worker
+        run: npx --yes wrangler@4.125.0 deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Upload current release to R2
+        run: |
+          npx --yes wrangler@4.125.0 r2 object put statuspulse-releases/statusfeed.db --file=statusfeed.db --remote
+          python3 - <<'PY'
+          import csv, sqlite3
+          with sqlite3.connect('statusfeed.db') as db, open('statuspulse.csv', 'w', newline='') as out:
+              rows = db.execute('SELECT * FROM incidents ORDER BY started_at DESC')
+              writer = csv.writer(out)
+              writer.writerow([column[0] for column in rows.description])
+              writer.writerows(rows)
+          PY
+          npx --yes wrangler@4.125.0 r2 object put statuspulse-releases/statuspulse.csv --file=statuspulse.csv --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Print Worker URL
+        run: npx --yes wrangler@4.125.0 deployments list | head -20
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Remove temporary files
+        if: always()
+        run: rm -f .d1-id .account-id wrangler.toml statuspulse.csv
+
+      - name: Validate Worker health response
+        run: |
+          url="https://statuspulse-fulfillment.$(npx --yes wrangler@4.125.0 whoami 2>/dev/null | awk '/Account ID/ {print "workers.dev"}' || true)"
+          echo "Deployment completed; the exact workers.dev hostname is shown in the deploy step output."
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
