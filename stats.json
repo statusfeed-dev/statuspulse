@@ -1,15 +1,15 @@
 {
-  "total": 518,
-  "last30d": 225,
+  "total": 522,
+  "last30d": 228,
   "coverage_start": "2019-05-07T09:45:37.229Z",
-  "coverage_end": "2026-08-24T13:56:54.964Z",
-  "computed_at": "2026-08-24T14:27:38.595753+00:00",
+  "coverage_end": "2026-08-24T17:14:43.692Z",
+  "computed_at": "2026-08-24T19:48:05.595770+00:00",
   "by_source": {
+    "digitalocean": 54,
+    "supabase": 56,
     "github": 94,
-    "supabase": 55,
+    "twilio": 59,
     "cloudflare": 58,
-    "twilio": 57,
-    "digitalocean": 53,
     "openai": 25,
     "vercel": 63,
     "google-cloud": 5,
@@ -17,5 +17,5 @@
     "aws": 2,
     "atlassian": 35
   },
-  "unresolved": 14
+  "unresolved": 13
 }
