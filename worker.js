@@ -46,7 +46,8 @@ async function webhook(request, env) {
   let event;
   try { event = await verifyStripe(payload, request.headers.get("Stripe-Signature"), env.STRIPE_WEBHOOK_SECRET); }
   catch (_) { return response("invalid webhook\n", 400); }
-  if (event.livemode === true && env.STATUSPULSE_ALLOW_LIVE !== "true") return response("live mode disabled\n", 400);
+  if (event.livemode !== true || env.STATUSPULSE_ALLOW_LIVE !== "true") return response("live mode disabled\n", 400);
+  if (typeof event.id !== "string" || !event.id) return response("invalid event\n", 400);
   const existing = await env.DB.prepare("SELECT event_id FROM stripe_events WHERE event_id = ?").bind(event.id).first();
   if (existing) return response("duplicate\n");
   const object = event.data?.object || {};

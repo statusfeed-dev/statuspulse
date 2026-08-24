@@ -7,11 +7,13 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-DB = ROOT.parent / "statusfeed.db"
+DB = ROOT / "statusfeed.db"
 OUT = ROOT / "index.html"
 SAMPLE = ROOT / "statuspulse-sample.csv"
 LINK_STANDARD = "https://buy.stripe.com/9B6eVe0wp7eGaVc1bT8og00"
 LINK_FOUNDING = "https://buy.stripe.com/bJe5kE4MF2Yq2oG2fX8og01"
+LINK_PRO = "https://buy.stripe.com/6oUdRacf756ybZgf2J8og02"
+LINK_ANNUAL = "https://buy.stripe.com/bJe8wQ92VbuW4wO4o58og03"
 
 
 def esc(value):
@@ -80,12 +82,13 @@ def main():
 <meta name="description" content="Continuously refreshed, queryable incident history from official cloud-provider status pages.">
 <title>StatusPulse — incident history and vendor reliability data</title>
 <style>
-body{{font-family:system-ui,-apple-system,sans-serif;max-width:1100px;margin:2rem auto;padding:0 1rem;color:#17202a;line-height:1.45}}
-h1 span{{color:#087f5b}} h2{{margin-top:2rem}} a{{color:#0866c6}} .grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.8rem}}
+body{{font-family:system-ui,-apple-system,sans-serif;max-width:1100px;margin:2rem auto;padding:0 1rem;color:#17202a;line-height:1.5}}
+h1 span{{color:#087f5b}} h2{{margin-top:2rem}} a{{color:#0866c6}} a:focus,button:focus{{outline:3px solid #74c0fc;outline-offset:2px}} .grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.8rem}}
 .card{{border:1px solid #d9e2e8;border-radius:10px;padding:1rem;background:#fbfdfd}} .big{{font-size:1.7rem;font-weight:700}}
-table{{border-collapse:collapse;width:100%;font-size:.9rem}}td,th{{padding:.55rem .6rem;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}}
+table{{border-collapse:collapse;width:100%;font-size:.9rem}}td,th{{padding:.65rem .6rem;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}}th{{background:#f8fafc}}
 .status{{border-radius:999px;padding:.15rem .5rem;background:#eef2f4;font-size:.8rem}}.resolved{{color:#087f5b;background:#d3f9d8}}.investigating,.identified{{color:#9a3412;background:#ffedd5}}
-.cta{{background:#e6fcf5;border:1px solid #96f2d7;border-radius:10px;padding:1rem}}small{{color:#59636e}}
+.cta{{background:#e6fcf5;border:1px solid #96f2d7;border-radius:10px;padding:1rem}}.plans{{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.75rem;margin-top:1rem}}.plan{{background:#fff;border:1px solid #b2f2bb;border-radius:8px;padding:.8rem}}.plan a{{display:inline-block;font-weight:700;margin-top:.4rem}}small{{color:#59636e}}
+@media(max-width:640px){{body{{margin:1rem auto}}table{{display:block;overflow-x:auto;white-space:nowrap}}}}
 </style></head><body>
 <h1>Status<span>Pulse</span></h1>
 <p><strong>Evidence for vendor reliability reviews.</strong> StatusPulse preserves official incident timelines across {len(providers)} infrastructure providers in queryable CSV/SQLite form. It is a historical dataset, not synthetic monitoring or an uptime guarantee.</p>
@@ -94,7 +97,7 @@ table{{border-collapse:collapse;width:100%;font-size:.9rem}}td,th{{padding:.55re
 <h2>Recent incident timeline</h2><p>Use this view to investigate recurring vendor failures, compare incident impact, and retain evidence beyond a provider's dashboard history.</p>
 <table><tr><th>Provider</th><th>Incident</th><th>Status</th><th>Impact</th><th>Started</th></tr>{incident_rows}</table>
 <h2>Provider coverage and median resolution time</h2><table><tr><th>Provider</th><th>Incidents captured</th><th>Median resolved duration</th></tr>{score_rows}</table>
-<div class="cta"><h2>Download or subscribe</h2><p><a href="statuspulse-sample.csv" download>Download the current 100-row CSV sample</a> · <a href="https://github.com/statusfeed-dev/statuspulse-export">Use the free CLI exporter</a></p><p>The paid release includes the current full CSV/SQLite dataset for SRE, platform, vendor-management, and reliability-research workflows.</p><p><a href="{LINK_STANDARD}">Subscribe — $5/month</a> · <a href="{LINK_FOUNDING}">Founding member — $3/month</a></p><small>Initial subscribers receive the current release. Automated subscriber delivery is being connected; do not rely on this page as an API endpoint.</small></div>
+<div class="cta"><h2>Get the data</h2><p><a href="statuspulse-sample.csv" download>Download the current 100-row CSV sample</a> · <a href="https://github.com/statusfeed-dev/statuspulse-export">Use the free CLI exporter</a></p><p>The paid release includes the current full CSV and SQLite dataset, refreshed from official provider incident feeds. Subscribers get authenticated access immediately after checkout.</p><div class="plans"><div class="plan"><strong>Founding</strong><br>$3/month<br><a href="{LINK_FOUNDING}">Choose Founding</a></div><div class="plan"><strong>Standard</strong><br>$5/month<br><a href="{LINK_STANDARD}">Choose Standard</a></div><div class="plan"><strong>Pro</strong><br>$9/month<br><a href="{LINK_PRO}">Choose Pro</a></div><div class="plan"><strong>Annual</strong><br>$79/year<br><a href="{LINK_ANNUAL}">Choose Annual</a></div></div><small>Secure checkout by Stripe. Cancel recurring plans through Stripe. This is historical data, not synthetic monitoring or an uptime guarantee.</small></div>
 <p><small>Collected from official public status APIs with source URLs, timestamps, and normalized incident details. Sources: {esc(source_list)}. Built by statusfeed-dev.</small></p></body></html>'''
     OUT.write_text(page, encoding="utf-8")
     stats = {

@@ -1,21 +1,18 @@
 {
-  "total": 805,
-  "last30d": 337,
-  "coverage_start": "1772369485",
-  "coverage_end": "2026-08-23T05:11:37.000Z",
-  "computed_at": "2026-08-23T18:46:14.382055+00:00",
+  "total": 384,
+  "last30d": 164,
+  "coverage_start": "2019-05-07T09:45:37.229Z",
+  "coverage_end": "2026-08-22T11:01:44.026-07:00",
+  "computed_at": "2026-08-24T00:22:47.530805+00:00",
   "by_source": {
-    "digitalocean": 101,
-    "cloudflare": 101,
-    "twilio": 103,
-    "supabase": 100,
-    "vercel": 100,
-    "google-cloud": 5,
-    "github": 100,
-    "datadog": 100,
-    "atlassian": 68,
-    "aws": 2,
-    "openai": 25
+    "twilio": 50,
+    "cloudflare": 50,
+    "digitalocean": 50,
+    "supabase": 50,
+    "vercel": 50,
+    "github": 50,
+    "datadog": 50,
+    "atlassian": 34
   },
-  "unresolved": 20
+  "unresolved": 9
 }

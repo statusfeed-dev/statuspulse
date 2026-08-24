@@ -18,6 +18,7 @@ jobs:
         run: python3 collect.py
       - name: Regenerate page and sample
         run: python3 generate_site.py
+        working-directory: .
       - name: Commit refreshed release
         run: |
           git config user.name 'statusfeed-dev'

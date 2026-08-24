@@ -23,11 +23,11 @@ The paid release is a current downloadable CSV + SQLite snapshot covering offici
 - Standard: **$5/month** — [subscribe](https://buy.stripe.com/9B6eVe0wp7eGaVc1bT8og00)
 - Founding member: **$3/month** — [subscribe](https://buy.stripe.com/bJe5kE4MF2Yq2oG2fX8og01)
 
-The fulfillment service in `fulfillment.py` grants authenticated, 24-hour access to the current release after a verified Stripe Checkout webhook. The static preview itself is not an API endpoint.
+The production fulfillment Worker grants authenticated, 24-hour access to the current release after a verified Stripe Checkout webhook. The static preview itself is not an API endpoint.
 
 ## Paid fulfillment service
 
-The service uses only the Python standard library. A valid test-mode `checkout.session.completed` webhook for a paid subscription creates an entitlement. Stripe Checkout must redirect to:
+The reference service uses only the Python standard library. The production Worker uses D1 and R2. A valid `checkout.session.completed` webhook for a paid subscription creates an entitlement. Stripe Checkout redirects to:
 
 `https://YOUR_FULFILLMENT_HOST/checkout/success?session_id={CHECKOUT_SESSION_ID}`
 
@@ -51,7 +51,8 @@ Each record includes source URL and collection timestamp. Statuspage records als
 - `collect.py` — hourly collector using official public status APIs only
 - `generate_site.py` — regenerates the page and sample from the local DB
 - `statuspulse-export.py` — free CLI lead magnet
-- `fulfillment.py` — signed webhook processing, entitlements, authentication, and downloads
+- `fulfillment.py` — local reference implementation and tests for signed webhook processing, entitlements, authentication, and downloads
+- `worker.js` — production Cloudflare Worker fulfillment boundary
 - `test_fulfillment.py` — fulfillment security and download tests
 - `stripe-listing.md` — product copy and fulfillment boundary
 
