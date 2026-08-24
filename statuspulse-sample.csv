@@ -1,5 +1,8 @@
 id,source,name,status,impact,started_at,resolved_at,fetched_at
+digitalocean:r96y45y5sx59,digitalocean,Managed Databases Creation,resolved,minor,2026-08-23T05:11:37.000Z,2026-08-23T14:33:31.719Z,2026-08-24T00:42:29.546364+00:00
+cloudflare:1wwc0f6m1c21,cloudflare,Elevated network errors for traffic routed between North America origins and SIN (Singapore) colo,resolved,none,2026-08-23T02:00:00.000Z,2026-08-23T02:00:00.000Z,2026-08-24T00:42:29.546364+00:00
 2gt97flg6pg9,twilio,SMS Delivery Receipt Delays from Twilio to I.C.E Costa Rica,identified,minor,2026-08-22T11:01:44.026-07:00,,2026-08-23T01:34:30.426978
+twilio:2gt97flg6pg9,twilio,SMS Delivery Receipt Delays from Twilio to ICE Costa Rica,identified,minor,2026-08-22T11:01:44.026-07:00,,2026-08-24T00:42:29.546364+00:00
 kld3sb19sdhj,twilio,SMS Delivery Delays from Twilio to Vivacom Bulgaria,resolved,minor,2026-08-22T08:20:32.943-07:00,2026-08-22T12:55:50.931-07:00,2026-08-23T01:34:30.426978
 k4f2dk5v0ldm,twilio,SMS Delivery Failures from Twilio to Dukagjini Kosovo,identified,minor,2026-08-22T07:38:17.611-07:00,,2026-08-23T01:34:30.426978
 xdzz2t911t1w,cloudflare,Network connectivity issues in Dubai (DXB),resolved,minor,2026-08-22T02:31:34.000Z,2026-08-22T02:57:56.480Z,2026-08-23T01:34:30.426978
@@ -26,6 +29,7 @@ jn37dmb9s37p,cloudflare,Missing R2 Audit Logs,resolved,none,2026-08-20T19:19:19.
 rq2nwg85qqn4,cloudflare,Elevated Errors R2 and Durable Objects,resolved,minor,2026-08-20T18:51:08.474Z,2026-08-20T19:32:37.615Z,2026-08-23T01:34:30.426978
 w8r0qkm97p1c,vercel,New container functions are failing,resolved,major,2026-08-20T17:46:33.302Z,2026-08-20T18:34:00.715Z,2026-08-23T01:34:30.426978
 f35vbpr3dv4h,cloudflare,Durable Objects and Downstream Service Errors,resolved,minor,2026-08-20T16:48:25.439Z,2026-08-20T17:48:08.512Z,2026-08-23T01:34:30.426978
+gcp:utF3FMFdQfwBzJcGG6vf,google-cloud,"We are investigating an issue where customers may experience timeouts, service degradations, errors, and elevated latencies across multiple products in the us-west1 region.",resolved,major,2026-08-20T15:40:00+00:00,2026-08-20T19:20:00+00:00,2026-08-24T00:42:29.546364+00:00
 bhbcjn4n3jzp,github,Intermittent failures creating agent tasks,resolved,critical,2026-08-20T14:43:01.526Z,2026-08-21T00:37:20.224Z,2026-08-23T01:34:30.426978
 76jq00tfhd4c,cloudflare,Increased Errors for Durable Objects and Downstream Services in Indonesia,resolved,minor,2026-08-20T13:10:35.000Z,2026-08-20T14:00:10.932Z,2026-08-23T01:34:30.426978
 xh5t9jy2cl6x,cloudflare,Network Performance Issues in India,resolved,minor,2026-08-20T11:38:10.411Z,2026-08-20T15:14:12.519Z,2026-08-23T01:34:30.426978
@@ -95,7 +99,3 @@ jxdzyqckdmqb,cloudflare,Increased 503s when making changes to Cloudflare dash an
 f3czlxddtrf1,cloudflare,Increased  errors for Workers KV requests,resolved,minor,2026-08-13T17:31:16.489Z,2026-08-13T17:53:25.517Z,2026-08-23T01:34:30.426978
 br0y58121k86,cloudflare,MCP Server Portal experiencing intermittent issues with user authentication,resolved,minor,2026-08-13T16:49:38.816Z,2026-08-13T17:38:44.193Z,2026-08-23T01:34:30.426978
 pf25whpq58hh,github,Disruption with GHEC Team Sync,resolved,minor,2026-08-13T16:21:33.096Z,2026-08-13T18:27:54.660Z,2026-08-23T01:34:30.426978
-vt86k1gy6cpz,twilio,Voice Call Failures from a Subset of Twilio Phone Numbers to Multiple Networks in Colombia,resolved,minor,2026-08-13T16:19:43.354-07:00,2026-08-15T17:35:54.735-07:00,2026-08-23T01:34:30.426978
-h79v9rn8h6ml,cloudflare,Cloudflare Workers AI errors with Specific models,resolved,minor,2026-08-13T15:00:29.359Z,2026-08-13T16:51:34.848Z,2026-08-23T01:34:30.426978
-y3kn2w2qf5s4,digitalocean,Volume Attach/Detach events in FRA1,resolved,none,2026-08-13T14:59:44.840Z,2026-08-13T14:59:44.895Z,2026-08-23T01:34:30.426978
-k8vbzwqjkxzn,github,Incident with Webhooks,resolved,minor,2026-08-13T14:45:40.422Z,2026-08-13T15:36:34.631Z,2026-08-23T01:34:30.426978
