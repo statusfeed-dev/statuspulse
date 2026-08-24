@@ -1,11 +1,11 @@
 {
-  "total": 424,
-  "last30d": 173,
+  "total": 425,
+  "last30d": 174,
   "coverage_start": "1772369485",
-  "coverage_end": "2026-08-24T07:12:05.367Z",
-  "computed_at": "2026-08-24T07:15:40.968686+00:00",
+  "coverage_end": "2026-08-24T07:19:22.991Z",
+  "computed_at": "2026-08-24T07:20:16.941029+00:00",
   "by_source": {
-    "github": 51,
+    "github": 52,
     "supabase": 52,
     "cloudflare": 53,
     "twilio": 51,
