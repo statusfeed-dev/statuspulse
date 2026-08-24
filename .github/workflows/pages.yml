@@ -29,7 +29,7 @@ jobs:
           import json, sqlite3
           db = sqlite3.connect('statusfeed.db')
           total = db.execute('SELECT COUNT(*) FROM incidents').fetchone()[0]
-          stats = json.load(open('site/stats.json'))
+          stats = json.load(open('stats.json'))
           assert stats['total'] == total, (stats['total'], total)
           assert stats['last30d'] >= 0
           assert stats['unresolved'] == db.execute("SELECT COUNT(*) FROM incidents WHERE status != 'resolved'").fetchone()[0]
