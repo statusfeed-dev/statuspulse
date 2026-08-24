@@ -3,7 +3,7 @@
   "last30d": 174,
   "coverage_start": "1772369485",
   "coverage_end": "2026-08-24T07:19:22.991Z",
-  "computed_at": "2026-08-24T07:20:16.941029+00:00",
+  "computed_at": "2026-08-24T08:31:03.953972+00:00",
   "by_source": {
     "github": 52,
     "supabase": 52,
@@ -17,5 +17,5 @@
     "aws": 2,
     "openai": 25
   },
-  "unresolved": 14
+  "unresolved": 12
 }
