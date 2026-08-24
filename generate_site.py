@@ -89,6 +89,12 @@ def main():
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="description" content="Continuously refreshed, queryable incident history from official cloud-provider status pages.">
+<link rel="canonical" href="https://statusfeed-dev.github.io/statuspulse/">
+<meta property="og:title" content="StatusPulse — incident history and vendor reliability data">
+<meta property="og:description" content="Citation-backed incident timelines from official provider status feeds, available as CSV and SQLite.">
+<meta property="og:url" content="https://statusfeed-dev.github.io/statuspulse/">
+<meta property="og:type" content="website">
+<script type="application/ld+json">{{"@context":"https://schema.org","@type":"Dataset","name":"StatusPulse incident history","description":"Citation-backed incident timelines from official cloud and SaaS status feeds.","url":"https://statusfeed-dev.github.io/statuspulse/","license":"https://github.com/statusfeed-dev/statuspulse/blob/main/stripe-listing.md","isAccessibleForFree":true,"keywords":"incident history, vendor reliability, SRE data, postmortem evidence"}}</script>
 <title>StatusPulse — incident history and vendor reliability data</title>
 <style>
 body{{font-family:system-ui,-apple-system,sans-serif;max-width:1100px;margin:2rem auto;padding:0 1rem;color:#17202a;line-height:1.5}}
