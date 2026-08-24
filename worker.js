@@ -44,9 +44,18 @@ async function verifyStripe(payload, header, secret) {
 async function webhook(request, env) {
   const payload = await request.text();
   let event;
-  try { event = await verifyStripe(payload, request.headers.get("Stripe-Signature"), env.STRIPE_WEBHOOK_SECRET); }
+  try {
+    const signature = request.headers.get("Stripe-Signature");
+    // Keep production live-only by default. A separate test secret and an
+    // explicit opt-in are required before accepting test-mode events.
+    const secret = env.STATUSPULSE_ALLOW_TEST === "true"
+      ? env.STRIPE_TEST_WEBHOOK_SECRET
+      : env.STRIPE_WEBHOOK_SECRET;
+    event = await verifyStripe(payload, signature, secret);
+    if (event.livemode !== true && !(env.STATUSPULSE_ALLOW_TEST === "true" && event.livemode === false)) throw new Error("mode disabled");
+  }
   catch (_) { return response("invalid webhook\n", 400); }
-  if (event.livemode !== true || env.STATUSPULSE_ALLOW_LIVE !== "true") return response("live mode disabled\n", 400);
+  if (event.livemode === true && env.STATUSPULSE_ALLOW_LIVE !== "true") return response("live mode disabled\n", 400);
   if (typeof event.id !== "string" || !event.id) return response("invalid event\n", 400);
   const existing = await env.DB.prepare("SELECT event_id FROM stripe_events WHERE event_id = ?").bind(event.id).first();
   if (existing) return response("duplicate\n");
@@ -92,7 +101,10 @@ async function download(request, env, path) {
 export default { async fetch(request, env) {
   const url = new URL(request.url);
   try {
+    if (request.method === "GET" && url.pathname === "/") return response("StatusPulse fulfillment service\n", 200, { "Content-Type": "text/plain; charset=utf-8" });
+    if (request.method === "GET" && url.pathname === "/healthz") return response("ok\n", 200, { "Content-Type": "text/plain; charset=utf-8" });
     if (request.method === "POST" && url.pathname === "/stripe/webhook") return await webhook(request, env);
+    if (url.pathname === "/stripe/webhook") return response("method not allowed\n", 405, { "Allow": "POST", "Content-Type": "text/plain; charset=utf-8" });
     if (request.method === "GET" && url.pathname === "/checkout/success") return await checkoutSuccess(request, env);
     if (request.method === "GET" && (url.pathname === "/download/statuspulse.csv" || url.pathname === "/download/statusfeed.db")) return await download(request, env, url.pathname);
     return response("not found\n", 404);

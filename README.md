@@ -25,7 +25,9 @@ The paid release is a current downloadable CSV + SQLite snapshot covering offici
 - Pro: **$9/month** — [subscribe](https://buy.stripe.com/6oUdRacf756ybZgf2J8og02)
 - Annual: **$79/year** — [subscribe](https://buy.stripe.com/bJe8wQ92VbuW4wO4o58og03)
 
-The production fulfillment Worker is live at https://statuspulse-fulfillment.statuspulse.workers.dev. It grants authenticated, 24-hour access to the current release after a verified Stripe Checkout webhook. The static preview itself is not an API endpoint.
+The production fulfillment Worker grants authenticated, 24-hour access to the current release after a verified Stripe Checkout webhook. The static preview itself is not an API endpoint.
+
+The fulfillment host root and `/healthz` return a simple availability response. The Stripe webhook requires a signed `POST`; opening it with a browser returns `405 Method Not Allowed`.
 
 ## Paid fulfillment service
 
@@ -43,6 +45,8 @@ STRIPE_WEBHOOK_SECRET=fixture_signing_secret PORT=8000 python3 fulfillment.py
 ```
 
 Do not put secrets in `.env`, source control, command output, or client-side code. Supply production secrets through the hosting platform's secret manager. See [stripe-listing.md](stripe-listing.md) for the production checklist.
+
+For test-mode verification, set `STATUSPULSE_ALLOW_TEST=true` and provide the separate Stripe test webhook signing secret as `STRIPE_TEST_WEBHOOK_SECRET`. These settings are intentionally absent from the production deployment, which remains live-only.
 
 Each record includes source URL and collection timestamp. Statuspage records also retain normalized component and update-count details; provider-specific records retain additional raw public metadata in `details`. AWS/Azure/GCP/OpenAI coverage may have different public-history windows and schemas, so compare only with the stated source and coverage metadata.
 

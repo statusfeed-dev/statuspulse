@@ -48,6 +48,8 @@ No Stripe resources or deployments are created by this repository. Before produc
 5. First repeat the complete flow in Stripe test mode. Confirm an unpaid or invalidly signed event grants nothing, a paid subscription enables both downloads, replaying the event changes nothing, and cancellation revokes access.
 6. Only after the test flow passes, explicitly set `STATUSPULSE_ALLOW_LIVE=true` in the production secret/configuration manager. Rotate the production signing secret if it is ever exposed, and configure backups/retention for the minimal operations database.
 
+For a safe test-mode deployment, use a separate Worker environment or temporary deployment configuration with `STATUSPULSE_ALLOW_TEST=true` and `STRIPE_TEST_WEBHOOK_SECRET` set to the test webhook endpoint's signing secret. Do not enable test mode on the production Worker unless the test secret is separately configured and the change is intentional.
+
 The current implementation deliberately does not create Stripe customers, prices, charges, webhooks, or deployments and does not send email. Checkout's success redirect is the delivery path.
 
 ## Refund/support policy draft
