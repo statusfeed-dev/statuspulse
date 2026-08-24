@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://statusfeed-dev.github.io/statuspulse/vendor-incident-history.html">
+<meta name="description" content="How to use citation-backed vendor incident history in reliability reviews and postmortem appendices.">
+<meta property="og:title" content="Vendor incident history for reviews and postmortems">
+<meta property="og:description" content="A practical, provenance-first workflow for preserving official provider incident timelines.">
+<title>Vendor incident history for reviews and postmortems | StatusPulse</title>
+<style>body{font-family:system-ui,-apple-system,sans-serif;max-width:800px;margin:2rem auto;padding:0 1rem;color:#17202a;line-height:1.6}h1{line-height:1.2}a{color:#0866c6}.box{background:#e6fcf5;border:1px solid #96f2d7;border-radius:10px;padding:1rem}code{background:#f1f3f5;padding:.1rem .25rem}</style></head><body>
+<p><a href="./">← StatusPulse incident history</a></p>
+<h1>Vendor incident history for reviews and postmortems</h1>
+<p>Vendor reviews and postmortems often need a durable record of what a provider publicly reported, when it was reported, and how long it remained unresolved. StatusPulse preserves those official incident timelines in portable CSV and SQLite formats.</p>
+<h2>A provenance-first workflow</h2>
+<ol><li>Choose the provider and review period.</li><li>Export the incident records with <code>source</code>, <code>started_at</code>, <code>resolved_at</code>, <code>impact</code>, and <code>fetched_at</code>.</li><li>Retain the source URL and collection timestamp with the review packet.</li><li>Compare incident frequency and declared duration only with the stated provider coverage window.</li><li>Keep the evidence separate from independent uptime, SLA, security, or causal analysis.</li></ol>
+<h2>What the dataset contains</h2>
+<p>StatusPulse collects official public status feeds from 11 infrastructure providers and normalizes incident timelines for cross-provider analysis. The free preview includes a current 100-row CSV sample. The paid release provides the current full CSV and SQLite snapshot.</p>
+<div class="box"><strong>Try the free artifacts</strong><p><a href="statuspulse-sample.csv" download>Download the 100-row sample</a> or use the <a href="https://github.com/statusfeed-dev/statuspulse-export">dependency-free CLI exporter</a> for one provider.</p><p><strong>Paid release:</strong> <a href="https://buy.stripe.com/bJe5kE4MF2Yq2oG2fX8og01">$3/month founding access</a> · <a href="https://buy.stripe.com/9B6eVe0wp7eGaVc1bT8og00">$5/month standard access</a></p></div>
+<h2>Limitations</h2>
+<p>Public status pages are provider-authored disclosures, not independent measurements. Coverage windows and schemas vary. This dataset is not synthetic monitoring, an uptime guarantee, breach history, compliance evidence, a security score, or causal attribution.</p>
+<p><small>Sources are official public status APIs. StatusPulse is not affiliated with any listed provider.</small></p>
+</body></html>
