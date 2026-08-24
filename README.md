@@ -20,10 +20,12 @@ python3 statuspulse-export.py https://www.githubstatus.com 30 incidents.csv
 
 The paid release is a current downloadable CSV + SQLite snapshot covering official incident timelines from GitHub, Cloudflare, Datadog, Vercel, Supabase, Twilio, Atlassian, DigitalOcean, OpenAI, Google Cloud, and AWS.
 
-- Standard: **$5/month** — [subscribe](https://buy.stripe.com/9B6eVe0wp7eGaVc1bT8og00)
 - Founding member: **$3/month** — [subscribe](https://buy.stripe.com/bJe5kE4MF2Yq2oG2fX8og01)
+- Standard: **$5/month** — [subscribe](https://buy.stripe.com/9B6eVe0wp7eGaVc1bT8og00)
+- Pro: **$9/month** — [subscribe](https://buy.stripe.com/6oUdRacf756ybZgf2J8og02)
+- Annual: **$79/year** — [subscribe](https://buy.stripe.com/bJe8wQ92VbuW4wO4o58og03)
 
-The production fulfillment Worker grants authenticated, 24-hour access to the current release after a verified Stripe Checkout webhook. The static preview itself is not an API endpoint.
+The production fulfillment Worker is live at https://statuspulse-fulfillment.statuspulse.workers.dev. It grants authenticated, 24-hour access to the current release after a verified Stripe Checkout webhook. The static preview itself is not an API endpoint.
 
 ## Paid fulfillment service
 
