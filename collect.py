@@ -95,26 +95,42 @@ def normalize_aws(data, now):
                json.dumps(inc, sort_keys=True, default=str))
 
 
+def insert_unique(db, row):
+    """Insert an incident unless the same natural key (source, name, started_at)
+    is already present under a different id — some status pages return the same
+    incident more than once with inconsistent ids."""
+    existing = db.execute(
+        "SELECT id FROM incidents WHERE source=? AND name=? AND started_at=?",
+        (row[1], row[2], row[5]),
+    ).fetchone()
+    if existing and existing[0] != row[0]:
+        return False
+    db.execute("INSERT OR REPLACE INTO incidents VALUES (?,?,?,?,?,?,?,?,?,?)", row)
+    return True
+
+
 def collect():
     db = init_db()
     now = datetime.datetime.now(datetime.timezone.utc).isoformat()
-    total = 0
+    total = inserted = 0
     for source, url in STATUSPAGE_SOURCES.items():
         try:
             for row in normalize_statuspage(source, url, fetch(url), now):
-                db.execute("INSERT OR REPLACE INTO incidents VALUES (?,?,?,?,?,?,?,?,?,?)", row)
+                if insert_unique(db, row):
+                    inserted += 1
                 total += 1
         except Exception as exc:
             print(f"{source}: ERROR {exc}", file=sys.stderr)
     for label, url, normalizer in (("google-cloud", GCP_URL, normalize_gcp), ("aws", AWS_URL, normalize_aws)):
         try:
             for row in normalizer(fetch(url), now):
-                db.execute("INSERT OR REPLACE INTO incidents VALUES (?,?,?,?,?,?,?,?,?,?)", row)
+                if insert_unique(db, row):
+                    inserted += 1
                 total += 1
         except Exception as exc:
             print(f"{label}: ERROR {exc}", file=sys.stderr)
     db.commit()
-    print(f"collected {total} incidents")
+    print(f"collected {total} incidents, inserted {inserted}")
     return total
 
 

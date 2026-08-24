@@ -71,7 +71,7 @@ def main():
         for r in recent[:25]
     )
     score_rows = "\n".join(
-        f'<tr><td>{esc(source)}</td><td>{provider_counts[source]}</td><td>{provider_mttr.get(source, 0):.2f} h</td></tr>'
+        f'<tr><td>{esc(source)}</td><td>{provider_counts[source]}</td><td>{("%.2f h" % provider_mttr[source]) if source in provider_mttr else "n/a"}</td></tr>'
         for source in sorted(provider_counts, key=lambda s: (-provider_counts[s], s))
     )
     impact_items = " · ".join(f"{esc(k)}: {v}" for k, v in sorted(impacts.items()))
