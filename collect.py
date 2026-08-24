@@ -98,12 +98,20 @@ def normalize_aws(data, now):
 def insert_unique(db, row):
     """Insert an incident unless the same natural key (source, name, started_at)
     is already present under a different id — some status pages return the same
-    incident more than once with inconsistent ids."""
+    incident more than once with inconsistent ids. NULL timestamps are compared
+    NULL-safely so rows without started_at still deduplicate, and legacy bare
+    ids are upgraded to the namespaced "<source>:<id>" form."""
     existing = db.execute(
-        "SELECT id FROM incidents WHERE source=? AND name=? AND started_at=?",
-        (row[1], row[2], row[5]),
+        "SELECT id FROM incidents WHERE source=? AND name=? AND started_at IS ? AND resolved_at IS ?",
+        (row[1], row[2], row[5], row[6]),
     ).fetchone()
-    if existing and existing[0] != row[0]:
+    namespaced = row[0].startswith(f"{row[1]}:")
+    if existing:
+        if existing[0] == row[0]:
+            db.execute("INSERT OR REPLACE INTO incidents VALUES (?,?,?,?,?,?,?,?,?,?)", row)
+        elif namespaced and not existing[0].startswith(f"{row[1]}:"):
+            db.execute("DELETE FROM incidents WHERE id=?", (existing[0],))
+            db.execute("INSERT OR REPLACE INTO incidents VALUES (?,?,?,?,?,?,?,?,?,?)", row)
         return False
     db.execute("INSERT OR REPLACE INTO incidents VALUES (?,?,?,?,?,?,?,?,?,?)", row)
     return True
