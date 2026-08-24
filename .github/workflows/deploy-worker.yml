@@ -52,6 +52,9 @@ jobs:
           compatibility_date = "2026-08-23"
           account_id = "$(cat .account-id)"
           
+          [vars]
+          STATUSPULSE_ALLOW_LIVE = "true"
+          
           [[d1_databases]]
           binding = "DB"
           database_name = "statuspulse"
