@@ -52,6 +52,11 @@ def init_db():
 def normalize_statuspage(source, url, data, now):
     for inc in data.get("incidents", []):
         updates = inc.get("incident_updates") or []
+        # Some pages (e.g. OpenAI) omit started_at; fall back to created_at,
+        # then to the earliest update timestamp.
+        started_at = inc.get("started_at") or inc.get("created_at") or (
+            min((u.get("display_at") or u.get("created_at") for u in updates
+                 if u.get("display_at") or u.get("created_at")), default=None))
         resolved_at = None
         if inc.get("status") == "resolved":
             resolved_at = inc.get("resolved_at") or (updates[0].get("updated_at") if updates else None)
@@ -62,7 +67,7 @@ def normalize_statuspage(source, url, data, now):
             "update_count": len(updates),
         }
         yield (f"{source}:{inc.get('id')}", source, inc.get("name"), inc.get("status"),
-               inc.get("impact"), inc.get("started_at"), resolved_at, now, url,
+               inc.get("impact"), started_at, resolved_at, now, url,
                json.dumps(details, sort_keys=True))
 
 
@@ -87,6 +92,15 @@ def normalize_aws(data, now):
         # AWS Health public archive fields vary; retain the raw normalized detail.
         started = inc.get("date") or inc.get("startTime")
         ended = inc.get("endDate") or inc.get("endTime")
+        # Normalize epoch-second timestamps (AWS archive format) to ISO 8601 so
+        # coverage windows and ordering stay consistent with other sources.
+        def iso(ts):
+            if ts is None:
+                return None
+            if isinstance(ts, str) and ts.isdigit():
+                return datetime.datetime.fromtimestamp(int(ts), datetime.timezone.utc).isoformat()
+            return ts
+        started, ended = iso(started), iso(ended)
         arn = inc.get("arn") or inc.get("id") or inc.get("eventArn")
         if not arn or not started:
             continue
