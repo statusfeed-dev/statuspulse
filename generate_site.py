@@ -49,12 +49,20 @@ def main():
     for r in recent:
         impacts[r["impact"] or "unknown"] = impacts.get(r["impact"] or "unknown", 0) + 1
     provider_counts = {}
+    provider_recent = {}
+    provider_major = {}
     provider_mttr = {}
     for r in rows:
-        provider_counts[r["source"]] = provider_counts.get(r["source"], 0) + 1
+        source = r["source"]
+        provider_counts[source] = provider_counts.get(source, 0) + 1
+        started = parse_dt(r["started_at"]) or datetime.min.replace(tzinfo=timezone.utc)
+        if started >= cutoff:
+            provider_recent[source] = provider_recent.get(source, 0) + 1
+            if r["impact"] in ("critical", "major"):
+                provider_major[source] = provider_major.get(source, 0) + 1
         h = duration_hours(r["started_at"], r["resolved_at"])
         if h is not None:
-            provider_mttr.setdefault(r["source"], []).append(h)
+            provider_mttr.setdefault(source, []).append(h)
     for source in provider_mttr:
         vals = sorted(provider_mttr[source])
         n = len(vals)
@@ -71,8 +79,8 @@ def main():
         for r in recent[:25]
     )
     score_rows = "\n".join(
-        f'<tr><td>{esc(source)}</td><td>{provider_counts[source]}</td><td>{("%.2f h" % provider_mttr[source]) if source in provider_mttr else "n/a"}</td></tr>'
-        for source in sorted(provider_counts, key=lambda s: (-provider_counts[s], s))
+        f'<tr><td>{esc(source)}</td><td>{provider_recent.get(source, 0)}</td><td>{provider_major.get(source, 0)}</td><td>{provider_counts[source]}</td><td>{("%.2f h" % provider_mttr[source]) if source in provider_mttr else "n/a"}</td></tr>'
+        for source in sorted(provider_counts, key=lambda s: (-provider_recent.get(s, 0), s))
     )
     impact_items = " · ".join(f"{esc(k)}: {v}" for k, v in sorted(impacts.items()))
     generated = now.strftime("%Y-%m-%d %H:%M UTC")
@@ -96,7 +104,7 @@ table{{border-collapse:collapse;width:100%;font-size:.9rem}}td,th{{padding:.65re
 <p><small>Last generated {generated}. Sources: {esc(source_list)}. Recent impact mix: {impact_items or "none"}.</small></p>
 <h2>Recent incident timeline</h2><p>Use this view to investigate recurring vendor failures, compare incident impact, and retain evidence beyond a provider's dashboard history.</p>
 <table><tr><th>Provider</th><th>Incident</th><th>Status</th><th>Impact</th><th>Started</th></tr>{incident_rows}</table>
-<h2>Provider coverage and median resolution time</h2><table><tr><th>Provider</th><th>Incidents captured</th><th>Median resolved duration</th></tr>{score_rows}</table>
+<h2>Provider reliability scorecard</h2><p>Incidents captured from each provider's official status feed, ranked by last-30-day volume. Severity counts include critical and major impacts only. Durations are medians of resolved incidents; coverage windows differ by source.</p><table><tr><th>Provider</th><th>Incidents (30d)</th><th>Critical/major (30d)</th><th>Incidents (all time)</th><th>Median resolved duration</th></tr>{score_rows}</table>
 <div class="cta"><h2>Get the data</h2><p><a href="statuspulse-sample.csv" download>Download the current 100-row CSV sample</a> · <a href="https://github.com/statusfeed-dev/statuspulse-export">Use the free CLI exporter</a></p><p>The paid release includes the current full CSV and SQLite dataset, refreshed from official provider incident feeds. Subscribers get authenticated access immediately after checkout.</p><div class="plans"><div class="plan"><strong>Founding</strong><br>$3/month<br><a href="{LINK_FOUNDING}">Choose Founding</a></div><div class="plan"><strong>Standard</strong><br>$5/month<br><a href="{LINK_STANDARD}">Choose Standard</a></div><div class="plan"><strong>Pro</strong><br>$9/month<br><a href="{LINK_PRO}">Choose Pro</a></div><div class="plan"><strong>Annual</strong><br>$79/year<br><a href="{LINK_ANNUAL}">Choose Annual</a></div></div><small>Secure checkout by Stripe. Cancel recurring plans through Stripe. This is historical data, not synthetic monitoring or an uptime guarantee.</small></div>
 <p><small>Collected from official public status APIs with source URLs, timestamps, and normalized incident details. Sources: {esc(source_list)}. Built by statusfeed-dev.</small></p></body></html>'''
     OUT.write_text(page, encoding="utf-8")
