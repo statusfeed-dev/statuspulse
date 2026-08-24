@@ -69,12 +69,16 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Install Stripe webhook secret
-        if: ${{ secrets.STRIPE_WEBHOOK_SECRET != '' }}
-        run: printf '%s' "$STRIPE_WEBHOOK_SECRET" | npx --yes wrangler@4.125.0 secret put STRIPE_WEBHOOK_SECRET
         env:
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$STRIPE_WEBHOOK_SECRET" ]; then
+            echo 'STRIPE_WEBHOOK_SECRET is not configured; skipping secret update.'
+            exit 0
+          fi
+          printf '%s' "$STRIPE_WEBHOOK_SECRET" | npx --yes wrangler@4.125.0 secret put STRIPE_WEBHOOK_SECRET
 
       - name: Deploy Worker
         run: npx --yes wrangler@4.125.0 deploy
