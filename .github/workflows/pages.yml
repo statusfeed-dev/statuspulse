@@ -23,6 +23,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Verify generated release is fresh and internally consistent
+        run: |
+          python3 - <<'PY'
+          import json, sqlite3
+          db = sqlite3.connect('statusfeed.db')
+          total = db.execute('SELECT COUNT(*) FROM incidents').fetchone()[0]
+          stats = json.load(open('stats.json'))
+          assert stats['total'] == total, (stats['total'], total)
+          assert stats['last30d'] >= 0
+          assert stats['unresolved'] == db.execute("SELECT COUNT(*) FROM incidents WHERE status != 'resolved'").fetchone()[0]
+          print(f'validated total={total} last30d={stats["last30d"]} unresolved={stats["unresolved"]}')
+          PY
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
