@@ -1,13 +1,13 @@
 {
-  "total": 542,
+  "total": 544,
   "last30d": 247,
   "coverage_start": "2019-05-07T09:45:37.229Z",
   "coverage_end": "2026-08-26T03:06:11.556Z",
-  "computed_at": "2026-08-26T03:38:47.186864+00:00",
+  "computed_at": "2026-08-26T08:24:43.212872+00:00",
   "by_source": {
     "vercel": 65,
+    "twilio": 77,
     "cloudflare": 60,
-    "twilio": 75,
     "digitalocean": 54,
     "supabase": 56,
     "github": 94,
@@ -17,5 +17,5 @@
     "aws": 2,
     "atlassian": 35
   },
-  "unresolved": 19
+  "unresolved": 15
 }
