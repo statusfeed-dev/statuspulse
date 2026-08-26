@@ -1,12 +1,12 @@
 {
-  "total": 544,
-  "last30d": 247,
+  "total": 545,
+  "last30d": 248,
   "coverage_start": "2019-05-07T09:45:37.229Z",
-  "coverage_end": "2026-08-26T03:06:11.556Z",
-  "computed_at": "2026-08-26T13:44:36.217117+00:00",
+  "coverage_end": "2026-08-26T06:44:58.819-07:00",
+  "computed_at": "2026-08-26T14:30:07.632072+00:00",
   "by_source": {
+    "twilio": 78,
     "vercel": 65,
-    "twilio": 77,
     "cloudflare": 60,
     "digitalocean": 54,
     "supabase": 56,
@@ -17,5 +17,5 @@
     "aws": 2,
     "atlassian": 35
   },
-  "unresolved": 15
+  "unresolved": 12
 }
