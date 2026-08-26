@@ -80,6 +80,14 @@ class FulfillmentApp:
                     expires_at INTEGER NOT NULL,
                     FOREIGN KEY(checkout_session_id) REFERENCES entitlements(checkout_session_id)
                 );
+                CREATE TABLE IF NOT EXISTS deliveries (
+                    checkout_session_id TEXT PRIMARY KEY,
+                    status TEXT NOT NULL CHECK(status IN ('queued', 'completed', 'failed')),
+                    queued_at INTEGER NOT NULL,
+                    completed_at INTEGER,
+                    attempts INTEGER NOT NULL DEFAULT 0,
+                    last_error TEXT
+                );
             """)
 
     @staticmethod
@@ -145,6 +153,11 @@ class FulfillmentApp:
                     ON CONFLICT(checkout_session_id) DO UPDATE SET
                         subscription_id = excluded.subscription_id, active = 1
                 """, (session_id, subscription_id, now))
+                db.execute("""
+                    INSERT INTO deliveries(checkout_session_id, status, queued_at, attempts)
+                    VALUES (?, 'queued', ?, 0)
+                    ON CONFLICT(checkout_session_id) DO UPDATE SET status='queued', last_error=NULL
+                """, (session_id, now))
             elif event_type == "customer.subscription.deleted":
                 subscription_id = obj.get("id")
                 if isinstance(subscription_id, str):
@@ -169,6 +182,10 @@ class FulfillmentApp:
                 "INSERT INTO access_sessions(token_hash, checkout_session_id, expires_at) VALUES (?, ?, ?)",
                 (token_hash, session_id, expires),
             )
+            db.execute("""
+                UPDATE deliveries SET status='completed', completed_at=?, attempts=attempts+1, last_error=NULL
+                WHERE checkout_session_id=? AND status='queued'
+            """, (int(self.clock()), session_id))
         cookie = f"{COOKIE_NAME}={token}; Path=/; Max-Age={SESSION_LIFETIME}; HttpOnly; Secure; SameSite=Lax"
         body = (b"<!doctype html><meta charset=utf-8><title>StatusPulse downloads</title>"
                 b"<h1>Your StatusPulse downloads</h1>"
