@@ -66,6 +66,8 @@ async function webhook(request, env) {
     if (object.mode !== "subscription" || object.payment_status !== "paid" || typeof object.id !== "string" || typeof object.subscription !== "string") return response("incomplete checkout\n", 400);
     statements.unshift(env.DB.prepare("INSERT INTO entitlements(checkout_session_id, subscription_id, active, created_at) VALUES (?, ?, 1, ?) ON CONFLICT(checkout_session_id) DO UPDATE SET subscription_id=excluded.subscription_id, active=1").bind(object.id, object.subscription, now));
     statements.unshift(env.DB.prepare("INSERT INTO deliveries(checkout_session_id, status, queued_at, attempts) VALUES (?, 'queued', ?, 0) ON CONFLICT(checkout_session_id) DO UPDATE SET status='queued', last_error=NULL").bind(object.id, now));
+    statements.unshift(env.DB.prepare("INSERT OR IGNORE INTO funnel_events(event_name, occurred_at, source_id, metadata) VALUES ('fulfillment_queued', ?, ?, ?)").bind(now, object.id, JSON.stringify({event_id:event.id})));
+    statements.unshift(env.DB.prepare("INSERT OR IGNORE INTO funnel_events(event_name, occurred_at, source_id, metadata) VALUES ('payment_succeeded', ?, ?, ?)").bind(now, object.id, JSON.stringify({event_id:event.id})));
   } else if (event.type === "customer.subscription.deleted" && typeof object.id === "string") {
     statements.unshift(env.DB.prepare("UPDATE entitlements SET active=0 WHERE subscription_id=?").bind(object.id));
   }
@@ -83,6 +85,7 @@ async function checkoutSuccess(request, env) {
   const expires = Math.floor(Date.now() / 1000) + SESSION_SECONDS;
   await env.DB.prepare("INSERT INTO access_sessions(token_hash, checkout_session_id, expires_at) VALUES (?, ?, ?)").bind(await sha256(token), sessionId, expires).run();
   await env.DB.prepare("UPDATE deliveries SET status='completed', completed_at=?, attempts=attempts+1, last_error=NULL WHERE checkout_session_id=? AND status='queued'").bind(Math.floor(Date.now() / 1000), sessionId).run();
+  await env.DB.prepare("INSERT OR IGNORE INTO funnel_events(event_name, occurred_at, source_id, metadata) VALUES ('delivery_completed', ?, ?, ?)").bind(Math.floor(Date.now() / 1000), sessionId, JSON.stringify({path:"checkout_success"})).run();
   return response(`<!doctype html><meta charset=utf-8><title>StatusPulse downloads</title><h1>Your StatusPulse downloads</h1><p><a href="/download/statuspulse.csv">Full CSV dataset</a></p><p><a href="/download/statusfeed.db">Full SQLite dataset</a></p>`, 200, { "Content-Type": "text/html; charset=utf-8", "Set-Cookie": sessionCookie(token), "Referrer-Policy": "no-referrer" });
 }
 

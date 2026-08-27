@@ -88,6 +88,15 @@ class FulfillmentApp:
                     attempts INTEGER NOT NULL DEFAULT 0,
                     last_error TEXT
                 );
+                CREATE TABLE IF NOT EXISTS funnel_events (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    event_name TEXT NOT NULL CHECK(event_name IN ('payment_succeeded', 'fulfillment_queued', 'delivery_completed', 'delivery_failed', 'refund')),
+                    occurred_at INTEGER NOT NULL,
+                    source_id TEXT NOT NULL,
+                    metadata TEXT,
+                    UNIQUE(event_name, source_id)
+                );
+                CREATE INDEX IF NOT EXISTS funnel_events_time_idx ON funnel_events(occurred_at);
             """)
 
     @staticmethod
@@ -158,6 +167,10 @@ class FulfillmentApp:
                     VALUES (?, 'queued', ?, 0)
                     ON CONFLICT(checkout_session_id) DO UPDATE SET status='queued', last_error=NULL
                 """, (session_id, now))
+                db.execute("INSERT OR IGNORE INTO funnel_events(event_name, occurred_at, source_id, metadata) VALUES (?, ?, ?, ?)",
+                           ("payment_succeeded", now, session_id, json.dumps({"event_id": event_id})))
+                db.execute("INSERT OR IGNORE INTO funnel_events(event_name, occurred_at, source_id, metadata) VALUES (?, ?, ?, ?)",
+                           ("fulfillment_queued", now, session_id, json.dumps({"event_id": event_id})))
             elif event_type == "customer.subscription.deleted":
                 subscription_id = obj.get("id")
                 if isinstance(subscription_id, str):
@@ -186,6 +199,8 @@ class FulfillmentApp:
                 UPDATE deliveries SET status='completed', completed_at=?, attempts=attempts+1, last_error=NULL
                 WHERE checkout_session_id=? AND status='queued'
             """, (int(self.clock()), session_id))
+            db.execute("INSERT OR IGNORE INTO funnel_events(event_name, occurred_at, source_id, metadata) VALUES (?, ?, ?, ?)",
+                       ("delivery_completed", int(self.clock()), session_id, json.dumps({"path": "checkout_success"})))
         cookie = f"{COOKIE_NAME}={token}; Path=/; Max-Age={SESSION_LIFETIME}; HttpOnly; Secure; SameSite=Lax"
         body = (b"<!doctype html><meta charset=utf-8><title>StatusPulse downloads</title>"
                 b"<h1>Your StatusPulse downloads</h1>"

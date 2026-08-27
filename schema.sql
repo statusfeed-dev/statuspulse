@@ -11,4 +11,13 @@ CREATE TABLE IF NOT EXISTS deliveries (
     attempts INTEGER NOT NULL DEFAULT 0,
     last_error TEXT
 );
+CREATE TABLE IF NOT EXISTS funnel_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_name TEXT NOT NULL CHECK(event_name IN ('payment_succeeded','fulfillment_queued','delivery_completed','delivery_failed','refund')),
+    occurred_at INTEGER NOT NULL,
+    source_id TEXT NOT NULL,
+    metadata TEXT,
+    UNIQUE(event_name, source_id)
+);
+CREATE INDEX IF NOT EXISTS funnel_events_time_idx ON funnel_events(occurred_at);
 DELETE FROM access_sessions WHERE expires_at <= unixepoch();

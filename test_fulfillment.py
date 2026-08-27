@@ -82,11 +82,13 @@ class FulfillmentTests(unittest.TestCase):
         with sqlite3.connect(self.ops) as db:
             self.assertEqual(1, db.execute("SELECT count(*) FROM entitlements WHERE active = 1").fetchone()[0])
             self.assertEqual(("queued", 0), db.execute("SELECT status, attempts FROM deliveries").fetchone())
+            self.assertEqual(["fulfillment_queued", "payment_succeeded"], [r[0] for r in db.execute("SELECT event_name FROM funnel_events ORDER BY event_name")])
 
     def test_success_redirect_records_completed_delivery(self):
         self.authenticate()
         with sqlite3.connect(self.ops) as db:
             self.assertEqual(("completed", 1), db.execute("SELECT status, attempts FROM deliveries").fetchone())
+            self.assertEqual(1, db.execute("SELECT count(*) FROM funnel_events WHERE event_name='delivery_completed'").fetchone()[0])
 
     def test_invalid_signature_is_rejected(self):
         response = self.signed_webhook(signature=f"t={NOW},v1={'0' * 64}")
