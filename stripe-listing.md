@@ -9,18 +9,20 @@ Continuously refreshed cross-provider incident history for SRE, platform, vendor
 ## Full description
 StatusPulse preserves incident timelines from official public Statuspage API endpoints across GitHub, Cloudflare, Datadog, Vercel, Supabase, Twilio, Atlassian, and DigitalOcean.
 
-The paid release is a current downloadable CSV and SQLite snapshot with source, incident name, status, impact, start/resolution timestamps, and fetch provenance. Use it to support vendor reviews, postmortems, reliability research, SLO reporting, and historical comparisons without manually collecting official status pages.
+The paid release is a current downloadable CSV and SQLite snapshot with incident identity, provider, incident name, status, impact, start/resolution timestamps, fetch provenance, source URL, and provider-specific incident details. Use it to support vendor reviews, postmortems, reliability research, SLO reporting, and historical comparisons without manually collecting official status pages.
 
 This is historical incident data, not synthetic monitoring, an uptime guarantee, or an API endpoint. Subscribers receive authenticated access to the current release immediately after successful checkout.
 
 ## Plans
 
+- **Founding member — $3/month:** current full CSV + SQLite release at the founding rate while available.
 - **Standard — $5/month:** current full CSV + SQLite release.
-- **Founding member — $3/month:** same current release at the founding rate while available.
+- **Pro — $9/month:** current full CSV + SQLite release.
+- **Annual — $79/year:** current full CSV + SQLite release for one year.
 
 ## Included fields
 
-`id, source, name, status, impact, started_at, resolved_at, fetched_at`
+`id, source, name, status, impact, started_at, resolved_at, fetched_at, source_url, details`
 
 ## Free preview
 
