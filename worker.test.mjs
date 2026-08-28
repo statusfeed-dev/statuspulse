@@ -14,31 +14,48 @@ import worker, {
 const SECRET = "whsec_fixture_only";
 const PAYMENT_LINK = "plink_fixture";
 const SCHEMA = readFileSync(new URL("./schema.sql", import.meta.url), "utf8");
-const MIGRATION = readFileSync(
-  new URL("./migrations/0001_statuspulse_order_state_v2.sql", import.meta.url),
+const WORKFLOW = readFileSync(
+  new URL("./.github/workflows/deploy-worker.yml", import.meta.url),
   "utf8",
 );
-const LEGACY_EVENT_TABLES = new Set([
-  "stripe_events",
-  "legacy_stripe_events_v1",
-]);
-const LEGACY_EVENT_COLUMNS = [
-  {
-    cid: 0,
-    name: "event_id",
-    type: "TEXT",
-    notnull: 0,
-    dflt_value: null,
-    pk: 1,
-  },
-  {
-    cid: 1,
-    name: "processed_at",
-    type: "INTEGER",
-    notnull: 1,
-    dflt_value: null,
-    pk: 0,
-  },
+const MIGRATION_NAME = "0001_statuspulse_order_state_v2.sql";
+const MIGRATION = readFileSync(
+  new URL(`./migrations/${MIGRATION_NAME}`, import.meta.url),
+  "utf8",
+);
+const V2_TABLE_COLUMNS = {
+  orders: [
+    "checkout_session_id", "payment_link_id", "payment_intent_id", "offer_id",
+    "offer_version", "amount_subtotal", "amount_tax", "amount_total", "currency",
+    "checkout_state", "checkout_event_created_at", "eligibility_state",
+    "payment_state", "fulfillment_state", "refunded_amount", "created_at",
+    "updated_at", "paid_at", "delivered_at",
+  ],
+  order_events: [
+    "event_id", "event_type", "object_id", "object_state", "stripe_created_at",
+    "processed_at",
+  ],
+  refunds: [
+    "refund_id", "payment_intent_id", "amount", "currency", "status",
+    "stripe_created_at", "created_at", "updated_at",
+  ],
+  risk_events: [
+    "risk_id", "payment_intent_id", "risk_type", "status", "disposition",
+    "stripe_created_at", "updated_at",
+  ],
+  rejected_events: [
+    "event_id", "event_type", "object_id", "reason_code", "first_seen_at",
+    "last_seen_at", "attempt_count", "resolved_at",
+  ],
+  schema_versions: ["version", "applied_at"],
+};
+const V2_INDEXES = [
+  "order_events_object_idx",
+  "orders_fulfillment_state_idx",
+  "orders_payment_state_idx",
+  "refunds_payment_intent_idx",
+  "rejected_events_unresolved_idx",
+  "risk_events_payment_intent_idx",
 ];
 
 function applyMigration(database) {
@@ -52,59 +69,111 @@ function applyMigration(database) {
   }
 }
 
-function tableObjectType(database, table) {
-  const row = database.prepare(
-    "SELECT type FROM sqlite_master WHERE name = ?",
-  ).get(table);
-  return row?.type ?? "absent";
+function applicationObjects(database) {
+  return database.prepare(
+    `SELECT name, type FROM sqlite_master
+      WHERE name NOT LIKE 'sqlite_%'
+        AND name NOT LIKE '_cf_%'
+        AND name <> 'd1_migrations'
+      ORDER BY name`,
+  ).all().map((row) => ({ ...row }));
 }
 
-function assertExactLegacyEventSchema(database, table) {
-  if (!LEGACY_EVENT_TABLES.has(table)) {
-    throw new Error("unsafe legacy event table identifier");
-  }
-  const columns = database.prepare(
-    `SELECT cid, name, upper(type) AS type, "notnull", dflt_value, pk
-       FROM pragma_table_info(?)
-      ORDER BY cid`,
-  ).all(table).map((row) => ({ ...row }));
-  if (JSON.stringify(columns) !== JSON.stringify(LEGACY_EVENT_COLUMNS)) {
-    throw new Error(`${table} does not match the exact legacy event schema`);
-  }
+function schemaDefinitions(database) {
+  return database.prepare(
+    `SELECT name, type, sql FROM sqlite_master
+      WHERE name NOT LIKE 'sqlite_%'
+        AND name NOT LIKE '_cf_%'
+        AND name <> 'd1_migrations'
+      ORDER BY type, name`,
+  ).all().map((row) => ({ ...row }));
 }
 
-function archiveLegacyStripeEvents(database) {
-  const sourceType = tableObjectType(database, "stripe_events");
-  const archiveType = tableObjectType(database, "legacy_stripe_events_v1");
-  if (sourceType === "table" && archiveType === "table") {
-    throw new Error("legacy Stripe event tables are ambiguous");
+const V2_SCHEMA_DEFINITIONS = (() => {
+  const database = new DatabaseSync(":memory:");
+  try {
+    database.exec(SCHEMA);
+    return schemaDefinitions(database);
+  } finally {
+    database.close();
   }
-  if (!["absent", "table"].includes(sourceType)
-      || !["absent", "table"].includes(archiveType)) {
-    throw new Error("legacy Stripe event object type is ambiguous");
+})();
+
+function assertV2TableContract(database) {
+  for (const [table, expectedColumns] of Object.entries(V2_TABLE_COLUMNS)) {
+    const columns = database.prepare(
+      "SELECT name FROM pragma_table_info(?) ORDER BY cid",
+    ).all(table).map(({ name }) => name);
+    assert.deepEqual(columns, expectedColumns, `${table} columns drifted`);
   }
-  if (sourceType === "table") {
-    assertExactLegacyEventSchema(database, "stripe_events");
-    const before = database.prepare(
-      "SELECT COUNT(*) AS count FROM stripe_events",
-    ).get().count;
-    database.exec(
-      "ALTER TABLE stripe_events RENAME TO legacy_stripe_events_v1",
-    );
-    assertExactLegacyEventSchema(database, "legacy_stripe_events_v1");
-    const after = database.prepare(
-      "SELECT COUNT(*) AS count FROM legacy_stripe_events_v1",
-    ).get().count;
-    if (before !== after || tableObjectType(database, "stripe_events") !== "absent") {
-      throw new Error("legacy Stripe event archive rename was not lossless");
+  assert.deepEqual(
+    database.prepare(
+      "SELECT version FROM schema_versions ORDER BY version",
+    ).all().map((row) => ({ ...row })),
+    [{ version: 2 }],
+  );
+}
+
+function assertV2SchemaContract(database) {
+  const expectedObjects = [
+    ...Object.keys(V2_TABLE_COLUMNS).map((name) => ({ name, type: "table" })),
+    ...V2_INDEXES.map((name) => ({ name, type: "index" })),
+  ].sort((left, right) => left.name.localeCompare(right.name));
+  assert.deepEqual(applicationObjects(database), expectedObjects);
+  assert.deepEqual(schemaDefinitions(database), V2_SCHEMA_DEFINITIONS);
+  assertV2TableContract(database);
+}
+
+function v2MigrationState(database) {
+  const historyObject = database.prepare(
+    "SELECT type FROM sqlite_master WHERE name = 'd1_migrations'",
+  ).get();
+  let history = [];
+  if (historyObject) {
+    if (historyObject.type !== "table") {
+      throw new Error("d1_migrations is not a table");
     }
-    return "renamed";
+    history = database.prepare(
+      "SELECT name FROM d1_migrations ORDER BY name",
+    ).all().map(({ name }) => name);
   }
-  if (archiveType === "table") {
-    assertExactLegacyEventSchema(database, "legacy_stripe_events_v1");
-    return "archived";
+  if (history.length === 0) {
+    const objects = applicationObjects(database);
+    if (objects.length !== 0) {
+      throw new Error("statuspulse-v2 has unexpected unmigrated objects");
+    }
+    return "pending";
   }
-  return "absent";
+  if (history.length === 1 && history[0] === MIGRATION_NAME) {
+    assertV2SchemaContract(database);
+    return "applied";
+  }
+  throw new Error("statuspulse-v2 has unexpected migration history");
+}
+
+function applyTrackedV2Migration(database) {
+  const state = v2MigrationState(database);
+  if (state === "applied") return "repeat";
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS d1_migrations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT UNIQUE NOT NULL,
+      applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+    BEGIN IMMEDIATE;
+  `);
+  try {
+    database.exec(MIGRATION);
+    database.prepare(
+      "INSERT INTO d1_migrations(name) VALUES (?)",
+    ).run(MIGRATION_NAME);
+    database.exec("COMMIT");
+  } catch (error) {
+    database.exec("ROLLBACK");
+    throw error;
+  }
+  assertV2SchemaContract(database);
+  return "applied";
 }
 
 class D1StatementFixture {
@@ -943,261 +1012,195 @@ test("the versioned D1 migration builds the production schema on a fresh databas
   const database = new DatabaseSync(":memory:");
   t.after(() => database.close());
 
-  assert.equal(archiveLegacyStripeEvents(database), "absent");
   applyMigration(database);
+  assertV2SchemaContract(database);
+});
 
-  const tables = database.prepare(
-    `SELECT name FROM sqlite_master
-       WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
-       ORDER BY name`,
-  ).all().map(({ name }) => name);
-  assert.deepEqual(tables, [
-    "order_events",
-    "orders",
-    "refunds",
-    "rejected_events",
-    "risk_events",
-    "schema_versions",
-  ]);
+test("the deployment workflow binds and migrates only statuspulse-v2", () => {
+  const d1Targets = [...WORKFLOW.matchAll(
+    /wrangler@4\.125\.0 d1 (?:execute|migrations apply) ([^\s]+)/g,
+  )].map((match) => match[1]);
+  assert.match(WORKFLOW, /database_name='statuspulse-v2'/);
+  assert.match(WORKFLOW, /"database_name": "statuspulse-v2"/);
+  assert.match(WORKFLOW, /d1 migrations apply statuspulse-v2 --remote/);
+  assert.match(WORKFLOW, /d1 execute statuspulse-v2 --remote/);
+  assert.ok(d1Targets.length >= 3);
+  assert.deepEqual([...new Set(d1Targets)], ["statuspulse-v2"]);
+  assert.doesNotMatch(WORKFLOW, /d1 (?:execute|migrations apply) statuspulse --remote/);
+  assert.doesNotMatch(WORKFLOW, /legacy_stripe_events|ALTER TABLE|DROP TABLE/);
+  assert.match(WORKFLOW, /SELECT name, type, sql FROM sqlite_master/);
+  assert.match(WORKFLOW, /actual_schema.*!=.*expected_schema/);
+});
+
+test("the tracked v2 migration is repeat-safe and preserves live rows", (t) => {
+  const database = new DatabaseSync(":memory:");
+  t.after(() => database.close());
+
+  assert.equal(v2MigrationState(database), "pending");
+  assert.equal(applyTrackedV2Migration(database), "applied");
+  database.prepare(
+    `INSERT INTO rejected_events(
+       event_id, event_type, object_id, reason_code,
+       first_seen_at, last_seen_at, attempt_count
+     ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+  ).run("evt_repeat", "test.event", "obj_repeat", "fixture", 1, 1, 1);
+
+  assert.equal(v2MigrationState(database), "applied");
+  assert.equal(applyTrackedV2Migration(database), "repeat");
   assert.deepEqual(
     database.prepare(
-      "SELECT version FROM schema_versions ORDER BY version",
+      "SELECT event_id, reason_code FROM rejected_events",
     ).all().map((row) => ({ ...row })),
-    [{ version: 2 }],
+    [{ event_id: "evt_repeat", reason_code: "fixture" }],
   );
 });
 
-test("the versioned D1 migration replaces an empty legacy schema without PII", (t) => {
-  const database = new DatabaseSync(":memory:");
-  t.after(() => database.close());
-  database.exec(`
-    CREATE TABLE orders (
-      checkout_session_id TEXT PRIMARY KEY,
-      customer_email TEXT,
-      customer_name TEXT,
-      shipping_address TEXT
-    );
-    CREATE TABLE stripe_events (
-      event_id TEXT PRIMARY KEY,
-      processed_at INTEGER NOT NULL
-    );
-    CREATE TABLE entitlements (customer_email TEXT);
-  `);
-
-  assert.equal(archiveLegacyStripeEvents(database), "renamed");
-  applyMigration(database);
-
-  const orderColumns = database.prepare(
-    "SELECT name FROM pragma_table_info('orders') ORDER BY cid",
-  ).all().map(({ name }) => name);
-  assert.equal(orderColumns.includes("checkout_event_created_at"), true);
-  assert.equal(orderColumns.includes("eligibility_state"), true);
-  assert.equal(orderColumns.includes("customer_email"), false);
-  assert.equal(orderColumns.includes("customer_name"), false);
-  assert.equal(orderColumns.includes("shipping_address"), false);
-  assert.equal(
-    database.prepare(
-      "SELECT COUNT(*) AS count FROM sqlite_master WHERE type = 'table' AND name = 'entitlements'",
-    ).get().count,
-    0,
-  );
-  assert.equal(
-    database.prepare(
-      "SELECT COUNT(*) AS count FROM legacy_stripe_events_v1",
-    ).get().count,
-    0,
-  );
-});
-
-test("the preservation preflight archives every legacy Stripe event row", (t) => {
-  const database = new DatabaseSync(":memory:");
-  t.after(() => database.close());
-  database.exec(`
-    CREATE TABLE stripe_events (
-      event_id TEXT PRIMARY KEY,
-      processed_at INTEGER NOT NULL
-    );
-    INSERT INTO stripe_events(event_id, processed_at) VALUES
-      ('evt_legacy_one', 1700000001),
-      ('evt_legacy_two', 1700000002);
-  `);
-
-  assert.equal(archiveLegacyStripeEvents(database), "renamed");
-  applyMigration(database);
-
-  assert.equal(tableObjectType(database, "stripe_events"), "absent");
-  assert.deepEqual(
-    database.prepare(
-      `SELECT event_id, processed_at
-         FROM legacy_stripe_events_v1
-        ORDER BY event_id`,
-    ).all().map((row) => ({ ...row })),
-    [
-      { event_id: "evt_legacy_one", processed_at: 1700000001 },
-      { event_id: "evt_legacy_two", processed_at: 1700000002 },
-    ],
-  );
-  assert.equal(
-    database.prepare("SELECT version FROM schema_versions").get().version,
-    2,
-  );
-});
-
-test("the preservation preflight safely resumes from an existing archive", (t) => {
-  const database = new DatabaseSync(":memory:");
-  t.after(() => database.close());
-  database.exec(`
-    CREATE TABLE legacy_stripe_events_v1 (
-      event_id TEXT PRIMARY KEY,
-      processed_at INTEGER NOT NULL
-    );
-    INSERT INTO legacy_stripe_events_v1(event_id, processed_at)
-    VALUES ('evt_already_archived', 1700000003);
-  `);
-
-  assert.equal(archiveLegacyStripeEvents(database), "archived");
-  applyMigration(database);
-
-  assert.deepEqual(
-    database.prepare(
-      "SELECT event_id, processed_at FROM legacy_stripe_events_v1",
-    ).all().map((row) => ({ ...row })),
-    [{ event_id: "evt_already_archived", processed_at: 1700000003 }],
-  );
-});
-
-test("the preservation preflight rejects invalid or ambiguous archive states", (t) => {
-  const invalid = new DatabaseSync(":memory:");
-  const ambiguous = new DatabaseSync(":memory:");
-  const nonTable = new DatabaseSync(":memory:");
-  t.after(() => invalid.close());
-  t.after(() => ambiguous.close());
-  t.after(() => nonTable.close());
-  invalid.exec("CREATE TABLE stripe_events (event_id TEXT PRIMARY KEY)");
-  ambiguous.exec(`
-    CREATE TABLE stripe_events (
-      event_id TEXT PRIMARY KEY,
-      processed_at INTEGER NOT NULL
-    );
-    CREATE TABLE legacy_stripe_events_v1 (
-      event_id TEXT PRIMARY KEY,
-      processed_at INTEGER NOT NULL
-    );
-  `);
-  nonTable.exec(`
-    CREATE VIEW stripe_events AS
-    SELECT 'evt_view' AS event_id, 1700000000 AS processed_at;
-  `);
-
-  assert.throws(
-    () => archiveLegacyStripeEvents(invalid),
-    /exact legacy event schema/,
-  );
-  assert.throws(
-    () => archiveLegacyStripeEvents(ambiguous),
-    /ambiguous/,
-  );
-  assert.throws(
-    () => archiveLegacyStripeEvents(nonTable),
-    /object type is ambiguous/,
-  );
-  assert.equal(tableObjectType(ambiguous, "stripe_events"), "table");
-  assert.equal(
-    tableObjectType(ambiguous, "legacy_stripe_events_v1"),
-    "table",
-  );
-});
-
-test("archived Stripe events survive when populated business tables block migration", (t) => {
-  const database = new DatabaseSync(":memory:");
-  t.after(() => database.close());
-  database.exec(`
-    CREATE TABLE stripe_events (
-      event_id TEXT PRIMARY KEY,
-      processed_at INTEGER NOT NULL
-    );
-    INSERT INTO stripe_events(event_id, processed_at)
-    VALUES ('evt_preserved_while_blocked', 1700000004);
+test("an unexpected populated or empty unmigrated v2 schema fails closed", (t) => {
+  const populated = new DatabaseSync(":memory:");
+  const empty = new DatabaseSync(":memory:");
+  t.after(() => populated.close());
+  t.after(() => empty.close());
+  populated.exec(`
     CREATE TABLE entitlements (checkout_session_id TEXT PRIMARY KEY);
-    INSERT INTO entitlements(checkout_session_id) VALUES ('cs_live_blocker');
+    INSERT INTO entitlements(checkout_session_id) VALUES ('cs_unexpected');
   `);
+  empty.exec("CREATE TABLE orders (checkout_session_id TEXT PRIMARY KEY)");
 
-  assert.equal(archiveLegacyStripeEvents(database), "renamed");
-  assert.throws(() => applyMigration(database), /CHECK constraint failed/);
-
-  assert.deepEqual(
-    database.prepare(
-      "SELECT event_id, processed_at FROM legacy_stripe_events_v1",
-    ).all().map((row) => ({ ...row })),
-    [{ event_id: "evt_preserved_while_blocked", processed_at: 1700000004 }],
+  assert.throws(
+    () => applyTrackedV2Migration(populated),
+    /unexpected unmigrated objects/,
+  );
+  assert.throws(
+    () => applyTrackedV2Migration(empty),
+    /unexpected unmigrated objects/,
   );
   assert.deepEqual(
-    database.prepare("SELECT checkout_session_id FROM entitlements")
+    populated.prepare("SELECT checkout_session_id FROM entitlements")
       .all().map((row) => ({ ...row })),
-    [{ checkout_session_id: "cs_live_blocker" }],
+    [{ checkout_session_id: "cs_unexpected" }],
   );
-  assert.equal(tableObjectType(database, "stripe_events"), "absent");
 });
 
-test("a direct migration cannot drop unarchived legacy Stripe events", (t) => {
+test("an empty Wrangler migration table can safely resume the first v2 migration", (t) => {
   const database = new DatabaseSync(":memory:");
   t.after(() => database.close());
   database.exec(`
-    CREATE TABLE stripe_events (
+    CREATE TABLE d1_migrations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT UNIQUE NOT NULL,
+      applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  assert.equal(v2MigrationState(database), "pending");
+  assert.equal(applyTrackedV2Migration(database), "applied");
+  assert.equal(v2MigrationState(database), "applied");
+});
+
+test("unexpected migration history and integrity-weakened schema fail closed", (t) => {
+  const wrongHistory = new DatabaseSync(":memory:");
+  const drifted = new DatabaseSync(":memory:");
+  const nonTableHistory = new DatabaseSync(":memory:");
+  t.after(() => wrongHistory.close());
+  t.after(() => drifted.close());
+  t.after(() => nonTableHistory.close());
+
+  wrongHistory.exec(`
+    CREATE TABLE d1_migrations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT UNIQUE NOT NULL,
+      applied_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+    INSERT INTO d1_migrations(name) VALUES ('0000_unexpected.sql');
+  `);
+  assert.throws(
+    () => v2MigrationState(wrongHistory),
+    /unexpected migration history/,
+  );
+
+  applyTrackedV2Migration(drifted);
+  drifted.exec(`
+    DROP INDEX refunds_payment_intent_idx;
+    DROP TABLE refunds;
+    CREATE TABLE refunds (
+      refund_id TEXT PRIMARY KEY,
+      payment_intent_id TEXT,
+      amount TEXT,
+      currency TEXT,
+      status TEXT,
+      stripe_created_at TEXT,
+      created_at TEXT,
+      updated_at TEXT
+    );
+    CREATE INDEX refunds_payment_intent_idx ON refunds(refund_id);
+  `);
+  assert.throws(() => v2MigrationState(drifted), assert.AssertionError);
+
+  nonTableHistory.exec(`
+    CREATE VIEW d1_migrations AS
+    SELECT 1 AS id, '${MIGRATION_NAME}' AS name, 'now' AS applied_at;
+  `);
+  assert.throws(
+    () => v2MigrationState(nonTableHistory),
+    /d1_migrations is not a table/,
+  );
+});
+
+test("the v2 migration snapshot matches schema.sql exactly", (t) => {
+  const snapshot = new DatabaseSync(":memory:");
+  const migrated = new DatabaseSync(":memory:");
+  t.after(() => snapshot.close());
+  t.after(() => migrated.close());
+
+  snapshot.exec(SCHEMA);
+  applyMigration(migrated);
+  assertV2SchemaContract(snapshot);
+  assertV2SchemaContract(migrated);
+  assert.deepEqual(
+    applicationObjects(migrated),
+    applicationObjects(snapshot),
+  );
+  assert.deepEqual(
+    schemaDefinitions(migrated),
+    schemaDefinitions(snapshot),
+  );
+});
+
+test("the forward-only migration cannot mutate legacy business rows", (t) => {
+  const legacy = new DatabaseSync(":memory:");
+  t.after(() => legacy.close());
+  legacy.exec(`
+    CREATE TABLE entitlements (
+      payment_id TEXT PRIMARY KEY,
+      access_token_hash TEXT NOT NULL
+    );
+    CREATE TABLE legacy_stripe_events_v1 (
       event_id TEXT PRIMARY KEY,
       processed_at INTEGER NOT NULL
     );
-    INSERT INTO stripe_events(event_id, processed_at) VALUES
-      ('evt_direct_one', 1700000005),
-      ('evt_direct_two', 1700000006);
+    INSERT INTO entitlements(payment_id, access_token_hash)
+    VALUES ('cs_legacy_paid', 'preserved_hash');
+    INSERT INTO legacy_stripe_events_v1(event_id, processed_at) VALUES
+      ('evt_legacy_one', 1700000005),
+      ('evt_legacy_two', 1700000006);
   `);
 
-  assert.throws(() => applyMigration(database), /CHECK constraint failed/);
-
+  assert.doesNotMatch(MIGRATION, /\b(?:ALTER|DROP|DELETE|UPDATE|REPLACE)\b/i);
+  applyMigration(legacy);
+  assertV2TableContract(legacy);
   assert.deepEqual(
-    database.prepare(
-      "SELECT event_id, processed_at FROM stripe_events ORDER BY event_id",
+    legacy.prepare(
+      "SELECT payment_id, access_token_hash FROM entitlements",
+    ).all().map((row) => ({ ...row })),
+    [{ payment_id: "cs_legacy_paid", access_token_hash: "preserved_hash" }],
+  );
+  assert.deepEqual(
+    legacy.prepare(
+      "SELECT event_id, processed_at FROM legacy_stripe_events_v1 ORDER BY event_id",
     ).all().map((row) => ({ ...row })),
     [
-      { event_id: "evt_direct_one", processed_at: 1700000005 },
-      { event_id: "evt_direct_two", processed_at: 1700000006 },
+      { event_id: "evt_legacy_one", processed_at: 1700000005 },
+      { event_id: "evt_legacy_two", processed_at: 1700000006 },
     ],
-  );
-  assert.equal(
-    tableObjectType(database, "legacy_stripe_events_v1"),
-    "absent",
-  );
-});
-
-test("the versioned D1 migration atomically refuses populated legacy tables", (t) => {
-  const database = new DatabaseSync(":memory:");
-  t.after(() => database.close());
-  database.exec(`
-    CREATE TABLE orders (
-      checkout_session_id TEXT PRIMARY KEY,
-      customer_email TEXT
-    );
-    INSERT INTO orders(checkout_session_id, customer_email)
-    VALUES ('cs_legacy', 'legacy@example.test');
-  `);
-
-  assert.throws(
-    () => applyMigration(database),
-    /CHECK constraint failed/,
-  );
-  assert.deepEqual(
-    database.prepare(
-      "SELECT checkout_session_id, customer_email FROM orders",
-    ).all().map((row) => ({ ...row })),
-    [{
-      checkout_session_id: "cs_legacy",
-      customer_email: "legacy@example.test",
-    }],
-  );
-  assert.equal(
-    database.prepare(
-      "SELECT COUNT(*) AS count FROM sqlite_master WHERE type = 'table' AND name = 'refunds'",
-    ).get().count,
-    0,
   );
 });

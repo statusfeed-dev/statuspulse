@@ -1,46 +1,8 @@
--- One-time replacement of the unused legacy subscription/order schema.
--- The deploy preflight renames an exact legacy stripe_events table to
--- legacy_stripe_events_v1, which this migration deliberately never touches.
--- Keeping stripe_events in the guard also makes a direct/bypassed migration
--- fail atomically instead of dropping unarchived legacy event rows.
-
-CREATE TABLE IF NOT EXISTS stripe_events (_migration_placeholder INTEGER);
-CREATE TABLE IF NOT EXISTS entitlements (_migration_placeholder INTEGER);
-CREATE TABLE IF NOT EXISTS access_sessions (_migration_placeholder INTEGER);
-CREATE TABLE IF NOT EXISTS deliveries (_migration_placeholder INTEGER);
-CREATE TABLE IF NOT EXISTS funnel_events (_migration_placeholder INTEGER);
-CREATE TABLE IF NOT EXISTS orders (_migration_placeholder INTEGER);
-CREATE TABLE IF NOT EXISTS order_events (_migration_placeholder INTEGER);
-CREATE TABLE IF NOT EXISTS refunds (_migration_placeholder INTEGER);
-CREATE TABLE IF NOT EXISTS risk_events (_migration_placeholder INTEGER);
-CREATE TABLE IF NOT EXISTS rejected_events (_migration_placeholder INTEGER);
-
-DROP TABLE IF EXISTS _statuspulse_migration_guard;
-CREATE TABLE _statuspulse_migration_guard (
-    row_count INTEGER NOT NULL CHECK(row_count = 0)
-);
-INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM stripe_events;
-INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM entitlements;
-INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM access_sessions;
-INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM deliveries;
-INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM funnel_events;
-INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM orders;
-INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM order_events;
-INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM refunds;
-INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM risk_events;
-INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM rejected_events;
-
-DROP TABLE _statuspulse_migration_guard;
-DROP TABLE stripe_events;
-DROP TABLE entitlements;
-DROP TABLE access_sessions;
-DROP TABLE deliveries;
-DROP TABLE funnel_events;
-DROP TABLE orders;
-DROP TABLE order_events;
-DROP TABLE refunds;
-DROP TABLE risk_events;
-DROP TABLE rejected_events;
+-- Initial schema for the isolated statuspulse-v2 database.
+-- This forward-only migration never references or mutates the legacy
+-- statuspulse database. Wrangler applies it transactionally and records the
+-- filename in d1_migrations, so a properly migrated v2 database is a no-op on
+-- repeat deploys.
 
 CREATE TABLE orders (
     checkout_session_id TEXT PRIMARY KEY,
