@@ -15,6 +15,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: statuspulse-worker-production
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -100,35 +104,154 @@ jobs:
           }
           EOF
 
-      - name: Preflight pending destructive migration
+      - name: Archive legacy Stripe events and preflight migration
         run: |
           set -euo pipefail
           migration_name='0001_statuspulse_order_state_v2.sql'
-          migrations_table_exists=$(npx --yes wrangler@4.125.0 d1 execute statuspulse --remote --json --command \
-            "SELECT COUNT(*) AS count FROM sqlite_master WHERE type='table' AND name='d1_migrations'" \
-            | jq -r '.[0].results[0].count')
+
+          d1_scalar() {
+            local sql="$1"
+            npx --yes wrangler@4.125.0 d1 execute statuspulse --remote --json \
+              --command "$sql" \
+              | jq -er '
+                  if length == 1
+                     and (.[0].results | length) == 1
+                     and (.[0].results[0] | has("value"))
+                  then .[0].results[0].value
+                  else error("unexpected D1 response shape")
+                  end
+                '
+          }
+
+          table_object_type() {
+            local table="$1"
+            case "$table" in
+              d1_migrations|stripe_events|legacy_stripe_events_v1|entitlements|access_sessions|deliveries|funnel_events|orders|order_events|refunds|risk_events|rejected_events) ;;
+              *) echo "Refusing unsafe table identifier: $table" >&2; return 1 ;;
+            esac
+            d1_scalar "SELECT COALESCE((SELECT type FROM sqlite_master WHERE name='$table'), 'absent') AS value"
+          }
+
+          legacy_event_schema_ok() {
+            local table="$1"
+            case "$table" in
+              stripe_events|legacy_stripe_events_v1) ;;
+              *) echo "Refusing unsafe archive identifier: $table" >&2; return 1 ;;
+            esac
+            d1_scalar "SELECT CASE WHEN
+              (SELECT COUNT(*) FROM pragma_table_info('$table')) = 2
+              AND (SELECT COUNT(*) FROM pragma_table_info('$table')
+                    WHERE cid=0 AND name='event_id' AND upper(type)='TEXT'
+                      AND \"notnull\"=0 AND dflt_value IS NULL AND pk=1) = 1
+              AND (SELECT COUNT(*) FROM pragma_table_info('$table')
+                    WHERE cid=1 AND name='processed_at' AND upper(type)='INTEGER'
+                      AND \"notnull\"=1 AND dflt_value IS NULL AND pk=0) = 1
+            THEN 1 ELSE 0 END AS value"
+          }
+
+          migrations_type=$(table_object_type d1_migrations)
           migration_applied=0
-          if [ "$migrations_table_exists" = '1' ]; then
-            migration_applied=$(npx --yes wrangler@4.125.0 d1 execute statuspulse --remote --json --command \
-              "SELECT COUNT(*) AS count FROM d1_migrations WHERE name='$migration_name'" \
-              | jq -r '.[0].results[0].count')
+          case "$migrations_type" in
+            table)
+              migration_applied=$(d1_scalar \
+                "SELECT COUNT(*) AS value FROM d1_migrations WHERE name='$migration_name'")
+              ;;
+            absent) ;;
+            *)
+              echo "Refusing migration: d1_migrations is a $migrations_type, not a table." >&2
+              exit 1
+              ;;
+          esac
+          if [ "$migration_applied" != '0' ] && [ "$migration_applied" != '1' ]; then
+            echo "Refusing migration: ambiguous migration history for $migration_name." >&2
+            exit 1
           fi
+
           if [ "$migration_applied" = '0' ]; then
-            for table in stripe_events entitlements access_sessions deliveries funnel_events orders order_events refunds risk_events rejected_events; do
-              table_exists=$(npx --yes wrangler@4.125.0 d1 execute statuspulse --remote --json --command \
-                "SELECT COUNT(*) AS count FROM sqlite_master WHERE type='table' AND name='$table'" \
-                | jq -r '.[0].results[0].count')
-              if [ "$table_exists" = '1' ]; then
-                row_count=$(npx --yes wrangler@4.125.0 d1 execute statuspulse --remote --json --command \
-                  "SELECT COUNT(*) AS count FROM $table" \
-                  | jq -r '.[0].results[0].count')
-                if [ "$row_count" != '0' ]; then
-                  echo "Refusing migration: legacy table $table has $row_count row(s)." >&2
+            stripe_type=$(table_object_type stripe_events)
+            archive_type=$(table_object_type legacy_stripe_events_v1)
+            case "$stripe_type:$archive_type" in
+              table:absent)
+                if [ "$(legacy_event_schema_ok stripe_events)" != '1' ]; then
+                  echo 'Refusing migration: stripe_events does not match the exact legacy schema.' >&2
                   exit 1
                 fi
+                legacy_event_count=$(d1_scalar \
+                  'SELECT COUNT(*) AS value FROM stripe_events')
+                npx --yes wrangler@4.125.0 d1 execute statuspulse --remote \
+                  --command 'ALTER TABLE stripe_events RENAME TO legacy_stripe_events_v1' \
+                  >/dev/null
+                if [ "$(table_object_type stripe_events)" != 'absent' ] \
+                   || [ "$(table_object_type legacy_stripe_events_v1)" != 'table' ] \
+                   || [ "$(legacy_event_schema_ok legacy_stripe_events_v1)" != '1' ]; then
+                  echo 'Legacy Stripe event archive rename did not produce the expected schema.' >&2
+                  exit 1
+                fi
+                archived_event_count=$(d1_scalar \
+                  'SELECT COUNT(*) AS value FROM legacy_stripe_events_v1')
+                if [ "$archived_event_count" != "$legacy_event_count" ]; then
+                  echo 'Legacy Stripe event archive row count changed during rename.' >&2
+                  exit 1
+                fi
+                ;;
+              absent:table)
+                if [ "$(legacy_event_schema_ok legacy_stripe_events_v1)" != '1' ]; then
+                  echo 'Refusing migration: existing legacy archive schema is invalid.' >&2
+                  exit 1
+                fi
+                ;;
+              absent:absent) ;;
+              table:table)
+                echo 'Refusing migration: stripe_events and its legacy archive both exist.' >&2
+                exit 1
+                ;;
+              *)
+                echo "Refusing migration: ambiguous Stripe event objects ($stripe_type/$archive_type)." >&2
+                exit 1
+                ;;
+            esac
+
+            for table in entitlements access_sessions deliveries funnel_events orders order_events refunds risk_events rejected_events; do
+              table_type=$(table_object_type "$table")
+              case "$table_type" in
+                absent) continue ;;
+                table) ;;
+                *)
+                  echo "Refusing migration: $table is a $table_type, not a table." >&2
+                  exit 1
+                  ;;
+              esac
+              row_count=$(d1_scalar "SELECT COUNT(*) AS value FROM $table")
+              if [ "$row_count" != '0' ]; then
+                echo "Refusing migration: business table $table has $row_count row(s)." >&2
+                exit 1
               fi
             done
+          else
+            if [ "$(table_object_type stripe_events)" != 'absent' ]; then
+              echo 'Refusing deploy: stripe_events reappeared after migration was applied.' >&2
+              exit 1
+            fi
           fi
+
+          archive_type=$(table_object_type legacy_stripe_events_v1)
+          case "$archive_type" in
+            absent)
+              printf '%s\n' absent > .legacy-stripe-event-count
+              ;;
+            table)
+              if [ "$(legacy_event_schema_ok legacy_stripe_events_v1)" != '1' ]; then
+                echo 'Refusing deploy: legacy Stripe event archive schema is invalid.' >&2
+                exit 1
+              fi
+              d1_scalar 'SELECT COUNT(*) AS value FROM legacy_stripe_events_v1' \
+                > .legacy-stripe-event-count
+              ;;
+            *)
+              echo "Refusing deploy: legacy Stripe event archive is a $archive_type." >&2
+              exit 1
+              ;;
+          esac
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -151,6 +274,38 @@ jobs:
               AND COALESCE((SELECT MAX(version) FROM schema_versions), 0) >= 2
             THEN 1 ELSE 0 END AS ok")
           printf '%s' "$schema_result" | jq -e '.[0].results[0].ok == 1' >/dev/null
+
+          expected_archive_count=$(cat .legacy-stripe-event-count)
+          if [[ ! "$expected_archive_count" =~ ^(absent|[0-9]+)$ ]]; then
+            echo 'Invalid legacy Stripe event archive expectation.' >&2
+            exit 1
+          fi
+          archive_type_result=$(npx --yes wrangler@4.125.0 d1 execute statuspulse --remote --json --command \
+            "SELECT COALESCE((SELECT type FROM sqlite_master WHERE name='legacy_stripe_events_v1'), 'absent') AS type")
+          archive_type=$(printf '%s' "$archive_type_result" | jq -er '.[0].results[0].type')
+          if [ "$expected_archive_count" = 'absent' ]; then
+            if [ "$archive_type" != 'absent' ]; then
+              echo 'Unexpected legacy Stripe event archive appeared during migration.' >&2
+              exit 1
+            fi
+          else
+            if [ "$archive_type" != 'table' ]; then
+              echo 'Legacy Stripe event archive disappeared during migration.' >&2
+              exit 1
+            fi
+            archive_result=$(npx --yes wrangler@4.125.0 d1 execute statuspulse --remote --json --command \
+              "SELECT CASE WHEN
+                (SELECT COUNT(*) FROM pragma_table_info('legacy_stripe_events_v1')) = 2
+                AND (SELECT COUNT(*) FROM pragma_table_info('legacy_stripe_events_v1')
+                      WHERE cid=0 AND name='event_id' AND upper(type)='TEXT'
+                        AND \"notnull\"=0 AND dflt_value IS NULL AND pk=1) = 1
+                AND (SELECT COUNT(*) FROM pragma_table_info('legacy_stripe_events_v1')
+                      WHERE cid=1 AND name='processed_at' AND upper(type)='INTEGER'
+                        AND \"notnull\"=1 AND dflt_value IS NULL AND pk=0) = 1
+                AND (SELECT COUNT(*) FROM legacy_stripe_events_v1) = $expected_archive_count
+              THEN 1 ELSE 0 END AS ok")
+            printf '%s' "$archive_result" | jq -e '.[0].results[0].ok == 1' >/dev/null
+          fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -189,4 +344,4 @@ jobs:
 
       - name: Remove temporary files
         if: always()
-        run: rm -f .d1-id .account-id wrangler.jsonc "${RUNNER_TEMP}/statuspulse-worker-secrets.env"
+        run: rm -f .d1-id .account-id .legacy-stripe-event-count wrangler.jsonc "${RUNNER_TEMP}/statuspulse-worker-secrets.env"

@@ -1,6 +1,8 @@
 -- One-time replacement of the unused legacy subscription/order schema.
--- The guard makes the migration fail atomically if any live row appears after
--- the deployment preflight and before Wrangler starts its migration backup.
+-- The deploy preflight renames an exact legacy stripe_events table to
+-- legacy_stripe_events_v1, which this migration deliberately never touches.
+-- Keeping stripe_events in the guard also makes a direct/bypassed migration
+-- fail atomically instead of dropping unarchived legacy event rows.
 
 CREATE TABLE IF NOT EXISTS stripe_events (_migration_placeholder INTEGER);
 CREATE TABLE IF NOT EXISTS entitlements (_migration_placeholder INTEGER);
