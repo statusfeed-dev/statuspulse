@@ -8,27 +8,202 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: statuspulse-data-refresh
+  cancel-in-progress: false
+
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      R2_BUCKET: statuspulse-releases
+      WRANGLER_VERSION: 4.125.0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify R2 bucket has no public access path
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          case "$CLOUDFLARE_ACCOUNT_ID" in
+            ''|*[!0-9A-Fa-f]*)
+              echo 'Cloudflare account ID has an invalid format' >&2
+              exit 1
+              ;;
+          esac
+          mkdir -p .release
+          api="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/r2/buckets/${R2_BUCKET}/domains"
+          curl --fail --silent --show-error --retry 3 --retry-all-errors \
+            --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            --header 'Accept: application/json' \
+            --output .release/r2-managed.json \
+            "${api}/managed"
+          curl --fail --silent --show-error --retry 3 --retry-all-errors \
+            --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            --header 'Accept: application/json' \
+            --output .release/r2-custom.json \
+            "${api}/custom"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          def result(path):
+              value = json.loads(Path(path).read_text(encoding="utf-8"))
+              if not isinstance(value, dict) or value.get("success") is not True:
+                  raise SystemExit("Cloudflare did not verify the R2 access boundary")
+              if value.get("errors") not in (None, []):
+                  raise SystemExit("Cloudflare returned an R2 boundary error")
+              return value.get("result")
+
+          managed = result(".release/r2-managed.json")
+          custom = result(".release/r2-custom.json")
+          if not isinstance(managed, dict) or managed.get("enabled") is not False:
+              raise SystemExit("R2 r2.dev public access is enabled or unverifiable")
+          if not isinstance(custom, dict) or custom.get("domains") != []:
+              raise SystemExit("R2 custom domains exist or are unverifiable")
+          PY
+          rm -f .release/r2-managed.json .release/r2-custom.json
+          echo 'Verified private R2 access boundary'
+
+      - name: Restore private working database mirror
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          npx --yes "wrangler@${WRANGLER_VERSION}" r2 object get \
+            "${R2_BUCKET}/statusfeed.db" \
+            --file=statusfeed.db \
+            --remote
+
+      - name: Enforce source-rights policy and sanitize restored data
+        run: |
+          set -euo pipefail
+          python3 source_policy.py validate
+          python3 source_policy.py sanitize statusfeed.db
+          mkdir -p .release
+          # Any recovery backup made by this workflow is already policy-safe.
+          cp statusfeed.db .release/before.db
+
+      - name: Validate private database baseline
+        id: baseline
+        run: |
+          set -euo pipefail
+          rows=$(python3 validate_release.py database statusfeed.db \
+            --minimum-rows 1 \
+            --minimum-sources 1)
+          case "$rows" in
+            ''|*[!0-9]*)
+              echo "Validator returned an invalid row count: $rows" >&2
+              exit 1
+              ;;
+          esac
+          echo "rows=$rows" >> "$GITHUB_OUTPUT"
+          echo "Validated canonical baseline with $rows rows"
+
       - name: Collect official public status feeds
         run: python3 collect.py
-      - name: Regenerate page, sample, and metadata
+
+      - name: Regenerate public page, sample, and metadata
+        env:
+          STATUSPULSE_PILOT_URL: ${{ vars.STATUSPULSE_PILOT_URL }}
         run: python3 generate_site.py
-        working-directory: .
-      - name: Commit refreshed release
+
+      - name: Export private full CSV
+        run: python3 export_release.py statusfeed.db .release/statuspulse.csv
+
+      - name: Validate complete release
         run: |
+          python3 validate_release.py release \
+            --database statusfeed.db \
+            --stats stats.json \
+            --mttr-stats mttr_stats.json \
+            --sample statuspulse-sample.csv \
+            --full-csv .release/statuspulse.csv \
+            --minimum-rows "${{ steps.baseline.outputs.rows }}" \
+            --minimum-sources 2
+
+      - name: Check main has not changed during collection
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+            echo "origin/main changed during collection; retry from the new revision" >&2
+            exit 1
+          fi
+
+      - name: Archive release pair and update best-effort R2 mirrors
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          release="releases/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          backup="backups/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-before.db"
+
+          # This immutable pair is the recovery source. before.db is the
+          # sanitized baseline, never the unsafe object originally restored.
+          # The fixed keys below are convenience mirrors.
+          npx --yes "wrangler@${WRANGLER_VERSION}" r2 object put \
+            "${R2_BUCKET}/${backup}" \
+            --file=.release/before.db \
+            --content-type=application/vnd.sqlite3 \
+            --remote \
+            --force
+          npx --yes "wrangler@${WRANGLER_VERSION}" r2 object put \
+            "${R2_BUCKET}/${release}/statusfeed.db" \
+            --file=statusfeed.db \
+            --content-type=application/vnd.sqlite3 \
+            --remote \
+            --force
+          npx --yes "wrangler@${WRANGLER_VERSION}" r2 object put \
+            "${R2_BUCKET}/${release}/statuspulse.csv" \
+            --file=.release/statuspulse.csv \
+            --content-type=text/csv \
+            --remote \
+            --force
+
+          npx --yes "wrangler@${WRANGLER_VERSION}" r2 object put \
+            "${R2_BUCKET}/statuspulse.csv" \
+            --file=.release/statuspulse.csv \
+            --content-type=text/csv \
+            --remote \
+            --force
+          npx --yes "wrangler@${WRANGLER_VERSION}" r2 object put \
+            "${R2_BUCKET}/statusfeed.db" \
+            --file=statusfeed.db \
+            --content-type=application/vnd.sqlite3 \
+            --remote \
+            --force
+
+      - name: Commit refreshed public artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if git ls-files --error-unmatch statusfeed.db >/dev/null 2>&1; then
+            echo 'statusfeed.db is tracked; refusing to publish' >&2
+            exit 1
+          fi
+          gh auth setup-git
           git config user.name 'statusfeed-dev'
           git config user.email 'statusfeed-dev@users.noreply.github.com'
-          git add statusfeed.db index.html statuspulse-sample.csv stats.json mttr_stats.json
+          git add -- index.html mttr_stats.json statuspulse-sample.csv stats.json
           if git diff --cached --quiet; then
-            echo 'No data changes'
+            echo 'No public artifact changes'
           else
-            git commit -m 'Refresh StatusPulse incident data'
-            git fetch origin main
-            git rebase origin/main
-            git push
+            git commit -m 'Refresh StatusPulse public incident data'
+            git push origin HEAD:main
           fi

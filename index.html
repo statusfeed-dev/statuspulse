@@ -1,64 +1,37 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<meta name="description" content="Continuously refreshed, queryable incident history from official cloud-provider status pages.">
+<meta name="description" content="Fixed-scope vendor dependency evidence briefs using cited primary sources and minimal normalized incident facts.">
 <link rel="canonical" href="https://statusfeed-dev.github.io/statuspulse/">
-<meta property="og:title" content="StatusPulse — incident history and vendor reliability data">
-<meta property="og:description" content="Citation-backed incident timelines from official provider status feeds, available as CSV and SQLite.">
+<meta property="og:title" content="StatusPulse — vendor dependency evidence brief">
+<meta property="og:description" content="A decision-ready evidence map for up to 20 SaaS and cloud dependencies.">
 <meta property="og:url" content="https://statusfeed-dev.github.io/statuspulse/">
 <meta property="og:type" content="website">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Dataset","name":"StatusPulse incident history","description":"Citation-backed incident timelines from official cloud and SaaS status feeds.","url":"https://statusfeed-dev.github.io/statuspulse/","license":"https://github.com/statusfeed-dev/statuspulse/blob/main/stripe-listing.md","isAccessibleForFree":true,"keywords":"incident history, vendor reliability, SRE data, postmortem evidence"}</script>
-<title>StatusPulse — incident history and vendor reliability data</title>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"Vendor Dependency Evidence Brief \u2014 Pilot","description":"One fixed-scope evidence brief for up to 20 named SaaS or cloud dependencies, using source links, original analysis, and only source-policy-gated automated incident data.","provider":{"@type":"Organization","name":"StatusPulse"}}</script>
+<title>StatusPulse — vendor dependency evidence brief</title>
 <style>
-body{font-family:system-ui,-apple-system,sans-serif;max-width:1100px;margin:2rem auto;padding:0 1rem;color:#17202a;line-height:1.5}
-h1 span{color:#087f5b} h2{margin-top:2rem} a{color:#0866c6} a:focus,button:focus{outline:3px solid #74c0fc;outline-offset:2px} .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.8rem}
-.card{border:1px solid #d9e2e8;border-radius:10px;padding:1rem;background:#fbfdfd} .big{font-size:1.7rem;font-weight:700}
+body{font-family:system-ui,-apple-system,sans-serif;max-width:1100px;margin:2rem auto;padding:0 1rem;color:#17202a;line-height:1.55}
+h1 span{color:#087f5b}h2{margin-top:2rem}a{color:#0866c6}a:focus,.button:focus{outline:3px solid #74c0fc;outline-offset:2px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.8rem}
+.card{border:1px solid #d9e2e8;border-radius:10px;padding:1rem;background:#fbfdfd}.big{font-size:1.7rem;font-weight:700}
 table{border-collapse:collapse;width:100%;font-size:.9rem}td,th{padding:.65rem .6rem;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}th{background:#f8fafc}
-.status{border-radius:999px;padding:.15rem .5rem;background:#eef2f4;font-size:.8rem}.resolved{color:#087f5b;background:#d3f9d8}.investigating,.identified{color:#9a3412;background:#ffedd5}
-.cta{background:#e6fcf5;border:1px solid #96f2d7;border-radius:10px;padding:1rem}.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.75rem;margin-top:1rem}.plan{background:#fff;border:1px solid #b2f2bb;border-radius:8px;padding:.8rem}.plan a{display:inline-block;font-weight:700;margin-top:.4rem}small{color:#59636e}
+.status{border-radius:999px;padding:.15rem .5rem;background:#eef2f4;font-size:.8rem}.resolved{color:#087f5b;background:#d3f9d8}.investigating,.identified,.monitoring{color:#9a3412;background:#ffedd5}
+.cta{background:#e6fcf5;border:1px solid #96f2d7;border-radius:10px;padding:1.25rem;margin-top:2rem}.button{display:inline-block;background:#087f5b;color:#fff;text-decoration:none;font-weight:700;border-radius:7px;padding:.7rem 1rem}small{color:#59636e}.fine-print{font-size:.88rem;color:#59636e}
 @media(max-width:640px){body{margin:1rem auto}table{display:block;overflow-x:auto;white-space:nowrap}}
 </style></head><body>
 <h1>Status<span>Pulse</span></h1>
-<p><strong>Evidence for vendor reliability reviews.</strong> StatusPulse preserves official incident timelines across 11 infrastructure providers in queryable CSV/SQLite form. It is a historical dataset, not synthetic monitoring or an uptime guarantee.</p>
-<div class="grid"><div class="card"><div class="big">545</div>Total incidents</div><div class="card"><div class="big">248</div>Started in 30 days</div><div class="card"><div class="big">12</div>Currently unresolved</div><div class="card"><div class="big">11</div>Official sources</div></div>
-<p><small>Last generated 2026-08-26 14:30 UTC. Sources: atlassian, aws, cloudflare, datadog, digitalocean, github, google-cloud, openai, supabase, twilio, vercel. Recent impact mix: critical: 8 · major: 18 · minor: 189 · none: 33.</small></p>
-<h2>Recent incident timeline</h2><p>Use this view to investigate recurring vendor failures, compare incident impact, and retain evidence beyond a provider's dashboard history.</p>
-<table><tr><th>Provider</th><th>Incident</th><th>Status</th><th>Impact</th><th>Started</th></tr><tr><td>twilio</td><td>SMS Delivery Delays and Failures from Twilio to Liberty Mobile Puerto Rico</td><td><span class="status investigating">investigating</span></td><td>minor</td><td>2026-08-26 06:44:58</td></tr>
-<tr><td>vercel</td><td>Failures logging in with Vercel CLI</td><td><span class="status resolved">resolved</span></td><td>major</td><td>2026-08-26 03:06:11</td></tr>
-<tr><td>twilio</td><td>Voice Call Failures from Twilio Phone Numbers to Vodafone Egypt</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-26 01:22:46</td></tr>
-<tr><td>twilio</td><td>Minor Issue Impacting Some Parts of Twilio Console Functionality.</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-25 22:50:36</td></tr>
-<tr><td>cloudflare</td><td>Network performance issues in Los Angeles</td><td><span class="status resolved">resolved</span></td><td>none</td><td>2026-08-25 21:30:00</td></tr>
-<tr><td>twilio</td><td>SMS and MMS Delivery Delays From a Subset of Twilio Long Codes to Multiple Networks in Australia</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-25 20:29:18</td></tr>
-<tr><td>vercel</td><td>Elevated build initialization times</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-25 19:27:23</td></tr>
-<tr><td>twilio</td><td>SMS Delivery Receipt Delays from Twilio to Multiple Networks in Brazil</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-25 17:23:09</td></tr>
-<tr><td>twilio</td><td>SMS Delivery Receipt Delays from Twilio to Globe Philippines</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-25 16:35:35</td></tr>
-<tr><td>twilio</td><td>SMS Delivery Delays from a Subset of Twilio Phone Numbers to Ufone Pakistan</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-25 16:18:57</td></tr>
-<tr><td>twilio</td><td>SMS Delivery Receipt Delays from Twilio to Telefonica Chile</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-25 15:34:26</td></tr>
-<tr><td>twilio</td><td>SMS Delivery Delays from a Subset of Twilio Phone Numbers to Drillisch 1&amp;1 Germany</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-25 13:02:51</td></tr>
-<tr><td>twilio</td><td>MMS Delivery Delays from a Subset of Twilio Long Codes to Videotron Canada</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-25 12:55:37</td></tr>
-<tr><td>twilio</td><td>Retroactive Incident: Elevated Latencies on Messaging Logs API</td><td><span class="status resolved">resolved</span></td><td>none</td><td>2026-08-25 11:37:13</td></tr>
-<tr><td>twilio</td><td>SMS Delivery Failures from Twilio Phone Numbers to MTN Zambia</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-25 11:07:09</td></tr>
-<tr><td>twilio</td><td>Voice Call Failures from Network Subscribers to a Subset of Twilio Portugal Phone Numbers</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-25 09:41:28</td></tr>
-<tr><td>twilio</td><td>SMS Delivery Receipt Delays From a Subset of Twilio Long Codes to Multiple Networks in Mexico</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-25 08:57:30</td></tr>
-<tr><td>twilio</td><td>Missing or Delayed Alert Notifications for Messaging Traffic Anomalies</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-25 08:45:06</td></tr>
-<tr><td>twilio</td><td>Voice Call Failures, Post Dial Delay, and Silent and One-Way Audio Between a Subset of Twilio Phone Numbers and Brazil</td><td><span class="status monitoring">monitoring</span></td><td>minor</td><td>2026-08-25 06:20:05</td></tr>
-<tr><td>twilio</td><td>MMS Delivery Receipt Delays from a Subset of Twilio Short Codes to Verizon United States</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-25 01:24:19</td></tr>
-<tr><td>twilio</td><td>SMS Delivery Delays from Twilio Phone Numbers to Claro Dominican Republic</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-24 23:10:13</td></tr>
-<tr><td>cloudflare</td><td>Increased Latency</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-24 20:38:27</td></tr>
-<tr><td>digitalocean</td><td>Cloud Control Panel and API</td><td><span class="status resolved">resolved</span></td><td>critical</td><td>2026-08-24 17:14:43</td></tr>
-<tr><td>twilio</td><td>SMS Delivery Receipt Delays from a Subset of Twilio Short Codes to Multiple Networks in United States</td><td><span class="status resolved">resolved</span></td><td>minor</td><td>2026-08-24 16:14:32</td></tr>
-<tr><td>supabase</td><td>Increased rates of Pooler connection timeouts in us-east-1</td><td><span class="status resolved">resolved</span></td><td>none</td><td>2026-08-24 15:26:51</td></tr></table>
-<h2>Provider reliability scorecard</h2><p>Incidents captured from each provider's official status feed, ranked by last-30-day volume. Severity counts include critical and major impacts only. Durations are medians of resolved incidents; coverage windows differ by source.</p><table><tr><th>Provider</th><th>Incidents (30d)</th><th>Critical/major (30d)</th><th>Incidents (all time)</th><th>Median resolved duration</th></tr><tr><td>twilio</td><td>78</td><td>1</td><td>78</td><td>4.18 h</td></tr>
-<tr><td>cloudflare</td><td>60</td><td>1</td><td>60</td><td>1.15 h</td></tr>
-<tr><td>github</td><td>39</td><td>11</td><td>94</td><td>5.89 h</td></tr>
-<tr><td>openai</td><td>23</td><td>0</td><td>25</td><td>1.41 h</td></tr>
-<tr><td>supabase</td><td>22</td><td>5</td><td>56</td><td>2.51 h</td></tr>
-<tr><td>digitalocean</td><td>12</td><td>3</td><td>54</td><td>2.55 h</td></tr>
-<tr><td>vercel</td><td>9</td><td>3</td><td>65</td><td>0.91 h</td></tr>
-<tr><td>datadog</td><td>4</td><td>1</td><td>71</td><td>1.77 h</td></tr>
-<tr><td>google-cloud</td><td>1</td><td>1</td><td>5</td><td>10.67 h</td></tr>
-<tr><td>atlassian</td><td>0</td><td>0</td><td>35</td><td>1.98 h</td></tr>
-<tr><td>aws</td><td>0</td><td>0</td><td>2</td><td>n/a</td></tr></table>
-<div class="cta"><h2>Get the data</h2><p><a href="statuspulse-sample.csv" download>Download the current 100-row CSV sample</a> · <a href="https://github.com/statusfeed-dev/statuspulse-export">Use the free CLI exporter</a></p><p>The paid release includes the current full CSV and SQLite dataset, refreshed from official provider incident feeds. Subscribers get authenticated access immediately after checkout.</p><div class="plans"><div class="plan"><strong>Founding</strong><br>$3/month<br><a href="https://buy.stripe.com/bJe5kE4MF2Yq2oG2fX8og01">Choose Founding</a></div><div class="plan"><strong>Standard</strong><br>$5/month<br><a href="https://buy.stripe.com/9B6eVe0wp7eGaVc1bT8og00">Choose Standard</a></div><div class="plan"><strong>Pro</strong><br>$9/month<br><a href="https://buy.stripe.com/6oUdRacf756ybZgf2J8og02">Choose Pro</a></div><div class="plan"><strong>Annual</strong><br>$79/year<br><a href="https://buy.stripe.com/bJe8wQ92VbuW4wO4o58og03">Choose Annual</a></div></div><small>Secure checkout by Stripe. Cancel recurring plans through Stripe. This is historical data, not synthetic monitoring or an uptime guarantee.</small></div>
-<p><small>Collected from official public status APIs with source URLs, timestamps, and normalized incident details. Sources: atlassian, aws, cloudflare, datadog, digitalocean, github, google-cloud, openai, supabase, twilio, vercel. Built by statusfeed-dev.</small></p>
-<p><small><a href="vendor-incident-history.html">Methodology: vendor incident history for reviews and postmortems</a></small></p></body></html>
+<p><strong>A decision-ready evidence brief for your vendor stack.</strong> Give us up to 20 SaaS or cloud dependencies. We map official status, service-health, support, and policy sources; identify evidence gaps; and include calculated incident metrics only for sources enabled by our dated, fail-closed source policy.</p>
+<div class="grid"><div class="card"><div class="big">39</div>Policy-gated normalized incidents</div><div class="card"><div class="big">1</div>Started in the last 30 days</div><div class="card"><div class="big">0</div>Active vendor reports in 30 days</div><div class="card"><div class="big">2</div>Automated sources currently enabled</div></div>
+<p><small>Dataset generated 2026-08-28 00:27 UTC. Enabled sources: atlassian, google-cloud. Recent impact mix: unknown: 1. Sources not enabled by the source policy are link-mapped but are not bulk-collected.</small></p>
+<div class="cta" id="pilot"><h2>$79 fixed-scope pilot</h2>
+<p><strong>One payment. No subscription.</strong> The first three pilot customers receive:</p>
+<ul><li>An official evidence map for up to 20 named dependencies, including status, support, service-health, and policy links where available.</li><li>A branded, print-ready report plus a supporting CSV of source-policy-gated factual records and direct source links.</li><li>Coverage gaps, renewal and due-diligence questions, and incident metrics for enabled documented-integration sources.</li><li>Delivery to the checkout email within two business days and one factual-correction pass.</li></ul>
+<p class="fine-print"><strong>Checkout temporarily unavailable.</strong> Please check back soon.</p>
+<p class="fine-print">Initial pilot sales are limited to US customers. Submit only non-confidential vendor names. If source-policy-approved material cannot support a useful brief, we will offer a replacement scope or a full refund before work starts. This is historical vendor-reported evidence, not real-time status, synthetic monitoring, an SLA audit, legal advice, or an uptime guarantee.</p></div>
+<h2>Preview the evidence</h2><p><a href="statuspulse-sample.csv" download>Download the current minimal-fact sample with source URLs</a>. It contains normalized factual fields and excludes provider narratives and raw feed objects.</p>
+<h2>Recent vendor-reported incidents</h2><table><tr><th>Provider</th><th>Incident</th><th>Status</th><th>Impact</th><th>Started</th></tr><tr><td>google-cloud</td><td>Google Cloud incident utF3FMFdQfwBzJcGG6vf</td><td><span class="status resolved">resolved</span></td><td></td><td>2026-08-20 15:40:00</td></tr></table>
+<h2>Enabled-source snapshot</h2><p>Only sources enabled by the dated source policy are automated. Counts reflect each enabled provider's available history window. Duration is the median among records with both start and resolution timestamps.</p><table><tr><th>Provider</th><th>Incidents (30d)</th><th>Critical/major (30d)</th><th>Incidents captured</th><th>Median resolved duration</th></tr><tr><td>google-cloud</td><td>1</td><td>0</td><td>5</td><td>10.67 h</td></tr>
+<tr><td>atlassian</td><td>0</td><td>0</td><td>34</td><td>1.98 h</td></tr></table>
+<p><small>Methodology: <a href="vendor-incident-history.html">how vendor incident history is collected and interpreted</a>.</small></p>
+<h2>Source rights and attribution</h2><ul><li>StatusPulse calculations and normalized records are independently produced from the cited official sources.</li><li>Each record must retain an exact official incident permalink.</li><li>StatusPulse is independent and is not affiliated with, endorsed by, or sponsored by Atlassian or Google.</li><li>The dataset is historical research material, not a real-time monitoring or outage-alerting service.</li><li>Source incident identifiers and factual service-health fields are attributed to Google Cloud through each official incident link.</li></ul>
+<p><small><a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a> · <a href="refunds.html">Refund policy</a> · <a href="support.html">Support</a></small></p>
+</body></html>

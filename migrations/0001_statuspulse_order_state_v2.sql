@@ -1,4 +1,46 @@
-CREATE TABLE IF NOT EXISTS orders (
+-- One-time replacement of the unused legacy subscription/order schema.
+-- The guard makes the migration fail atomically if any live row appears after
+-- the deployment preflight and before Wrangler starts its migration backup.
+
+CREATE TABLE IF NOT EXISTS stripe_events (_migration_placeholder INTEGER);
+CREATE TABLE IF NOT EXISTS entitlements (_migration_placeholder INTEGER);
+CREATE TABLE IF NOT EXISTS access_sessions (_migration_placeholder INTEGER);
+CREATE TABLE IF NOT EXISTS deliveries (_migration_placeholder INTEGER);
+CREATE TABLE IF NOT EXISTS funnel_events (_migration_placeholder INTEGER);
+CREATE TABLE IF NOT EXISTS orders (_migration_placeholder INTEGER);
+CREATE TABLE IF NOT EXISTS order_events (_migration_placeholder INTEGER);
+CREATE TABLE IF NOT EXISTS refunds (_migration_placeholder INTEGER);
+CREATE TABLE IF NOT EXISTS risk_events (_migration_placeholder INTEGER);
+CREATE TABLE IF NOT EXISTS rejected_events (_migration_placeholder INTEGER);
+
+DROP TABLE IF EXISTS _statuspulse_migration_guard;
+CREATE TABLE _statuspulse_migration_guard (
+    row_count INTEGER NOT NULL CHECK(row_count = 0)
+);
+INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM stripe_events;
+INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM entitlements;
+INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM access_sessions;
+INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM deliveries;
+INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM funnel_events;
+INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM orders;
+INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM order_events;
+INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM refunds;
+INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM risk_events;
+INSERT INTO _statuspulse_migration_guard SELECT COUNT(*) FROM rejected_events;
+
+DROP TABLE _statuspulse_migration_guard;
+DROP TABLE stripe_events;
+DROP TABLE entitlements;
+DROP TABLE access_sessions;
+DROP TABLE deliveries;
+DROP TABLE funnel_events;
+DROP TABLE orders;
+DROP TABLE order_events;
+DROP TABLE refunds;
+DROP TABLE risk_events;
+DROP TABLE rejected_events;
+
+CREATE TABLE orders (
     checkout_session_id TEXT PRIMARY KEY,
     payment_link_id TEXT NOT NULL,
     payment_intent_id TEXT UNIQUE,
@@ -28,12 +70,12 @@ CREATE TABLE IF NOT EXISTS orders (
     paid_at INTEGER,
     delivered_at INTEGER
 );
-CREATE INDEX IF NOT EXISTS orders_payment_state_idx
+CREATE INDEX orders_payment_state_idx
     ON orders(payment_state, updated_at);
-CREATE INDEX IF NOT EXISTS orders_fulfillment_state_idx
+CREATE INDEX orders_fulfillment_state_idx
     ON orders(fulfillment_state, updated_at);
 
-CREATE TABLE IF NOT EXISTS order_events (
+CREATE TABLE order_events (
     event_id TEXT PRIMARY KEY,
     event_type TEXT NOT NULL,
     object_id TEXT NOT NULL,
@@ -41,10 +83,10 @@ CREATE TABLE IF NOT EXISTS order_events (
     stripe_created_at INTEGER NOT NULL,
     processed_at INTEGER NOT NULL
 );
-CREATE INDEX IF NOT EXISTS order_events_object_idx
+CREATE INDEX order_events_object_idx
     ON order_events(event_type, object_id, processed_at);
 
-CREATE TABLE IF NOT EXISTS refunds (
+CREATE TABLE refunds (
     refund_id TEXT PRIMARY KEY,
     payment_intent_id TEXT NOT NULL,
     amount INTEGER NOT NULL CHECK(amount > 0),
@@ -56,10 +98,10 @@ CREATE TABLE IF NOT EXISTS refunds (
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL
 );
-CREATE INDEX IF NOT EXISTS refunds_payment_intent_idx
+CREATE INDEX refunds_payment_intent_idx
     ON refunds(payment_intent_id, status);
 
-CREATE TABLE IF NOT EXISTS risk_events (
+CREATE TABLE risk_events (
     risk_id TEXT PRIMARY KEY,
     payment_intent_id TEXT NOT NULL,
     risk_type TEXT NOT NULL CHECK(risk_type IN ('dispute', 'review')),
@@ -68,10 +110,10 @@ CREATE TABLE IF NOT EXISTS risk_events (
     stripe_created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL
 );
-CREATE INDEX IF NOT EXISTS risk_events_payment_intent_idx
+CREATE INDEX risk_events_payment_intent_idx
     ON risk_events(payment_intent_id, disposition);
 
-CREATE TABLE IF NOT EXISTS rejected_events (
+CREATE TABLE rejected_events (
     event_id TEXT PRIMARY KEY,
     event_type TEXT NOT NULL,
     object_id TEXT NOT NULL,
@@ -81,7 +123,7 @@ CREATE TABLE IF NOT EXISTS rejected_events (
     attempt_count INTEGER NOT NULL CHECK(attempt_count > 0),
     resolved_at INTEGER
 );
-CREATE INDEX IF NOT EXISTS rejected_events_unresolved_idx
+CREATE INDEX rejected_events_unresolved_idx
     ON rejected_events(resolved_at, last_seen_at);
 
 CREATE TABLE IF NOT EXISTS schema_versions (

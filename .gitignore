@@ -1,5 +1,10 @@
+# Private release artifacts: never commit or publish
+statusfeed.db
+statuspulse.csv
+.release/
+_site/
+
 # Local operations and credentials
 ops.db
 __pycache__/
 *.pyc
-# Collector database is intentionally tracked for the static data release

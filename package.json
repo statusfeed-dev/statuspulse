@@ -1,0 +1,11 @@
+{
+  "name": "statuspulse",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test worker.test.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

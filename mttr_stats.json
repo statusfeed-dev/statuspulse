@@ -1,1 +1,10 @@
-{"atlassian": {"median_mttr_hrs": 2.01, "n": 31}, "cloudflare": {"median_mttr_hrs": 1.18, "n": 50}, "datadog": {"median_mttr_hrs": 1.53, "n": 50}, "digitalocean": {"median_mttr_hrs": 2.36, "n": 50}, "github": {"median_mttr_hrs": 94.65, "n": 50}, "supabase": {"median_mttr_hrs": 2.71, "n": 48}, "twilio": {"median_mttr_hrs": 4.02, "n": 48}, "vercel": {"median_mttr_hrs": 1.02, "n": 50}}
+{
+  "atlassian": {
+    "median_mttr_hrs": 1.98,
+    "n": 34
+  },
+  "google-cloud": {
+    "median_mttr_hrs": 10.67,
+    "n": 5
+  }
+}

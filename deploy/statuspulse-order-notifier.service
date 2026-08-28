@@ -1,0 +1,29 @@
+[Unit]
+Description=Poll Stripe for paid StatusPulse pilot orders
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/home/hermes/.config/statuspulse/notifier.env
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/hermes/statuspulse
+EnvironmentFile=/home/hermes/.config/statuspulse/notifier.env
+ExecStart=/usr/bin/python3 -B /home/hermes/statuspulse/order_notifier.py poll
+UMask=0077
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=read-only
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+ReadWritePaths=/home/hermes/statuspulse/ops.db
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=true
+RestrictRealtime=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+SystemCallArchitectures=native

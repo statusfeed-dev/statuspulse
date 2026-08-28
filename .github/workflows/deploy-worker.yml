@@ -5,9 +5,10 @@ on:
     branches: [main]
     paths:
       - worker.js
+      - worker.test.mjs
+      - package.json
       - schema.sql
-      - statusfeed.db
-      - statuspulse-sample.csv
+      - migrations/**
       - .github/workflows/deploy-worker.yml
   workflow_dispatch:
 
@@ -26,6 +27,9 @@ jobs:
         with:
           node-version: 22
 
+      - name: Test production Worker contract
+        run: npm test
+
       - name: Ensure Cloudflare resources exist
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -40,85 +44,149 @@ jobs:
             created=$(curl --fail --silent -X POST "${auth[@]}" "$api/accounts/$CF_ACCOUNT_ID/d1/database" --data '{"name":"statuspulse"}')
             db_id=$(printf '%s' "$created" | jq -r '.result.uuid')
           fi
-          curl --fail --silent -X PUT "${auth[@]}" "$api/accounts/$CF_ACCOUNT_ID/r2/buckets/statuspulse-releases" --data '{"locationHint":"wnam"}' >/dev/null || true
           printf '%s\n' "$db_id" > .d1-id
           printf '%s\n' "$CF_ACCOUNT_ID" > .account-id
 
       - name: Write deployment configuration
+        env:
+          STATUSPULSE_ALLOW_LIVE: ${{ vars.STATUSPULSE_ALLOW_LIVE }}
+          STATUSPULSE_PAYMENT_LINK_ID: ${{ vars.STATUSPULSE_PAYMENT_LINK_ID }}
         run: |
-          cat > wrangler.toml <<EOF
-          name = "statuspulse-fulfillment"
-          main = "worker.js"
-          compatibility_date = "2026-08-23"
-          account_id = "$(cat .account-id)"
-          
-          [vars]
-          STATUSPULSE_ALLOW_LIVE = "true"
-          
-          [[d1_databases]]
-          binding = "DB"
-          database_name = "statuspulse"
-          database_id = "$(cat .d1-id)"
-          
-          [[r2_buckets]]
-          binding = "DATA"
-          bucket_name = "statuspulse-releases"
+          set -euo pipefail
+          if [ "$STATUSPULSE_ALLOW_LIVE" != 'true' ] && [ "$STATUSPULSE_ALLOW_LIVE" != 'false' ]; then
+            echo 'STATUSPULSE_ALLOW_LIVE must be true or false' >&2
+            exit 1
+          fi
+          if [[ ! "$STATUSPULSE_PAYMENT_LINK_ID" =~ ^plink_[A-Za-z0-9]+$ ]]; then
+            echo 'STATUSPULSE_PAYMENT_LINK_ID is missing or invalid' >&2
+            exit 1
+          fi
+          account_id=$(cat .account-id)
+          database_id=$(cat .d1-id)
+          if [[ ! "$account_id" =~ ^[A-Fa-f0-9]{32}$ ]]; then
+            echo 'Cloudflare account ID is invalid' >&2
+            exit 1
+          fi
+          if [[ ! "$database_id" =~ ^[A-Fa-f0-9-]{32,40}$ ]]; then
+            echo 'Cloudflare D1 database ID is invalid' >&2
+            exit 1
+          fi
+          cat > wrangler.jsonc <<EOF
+          {
+            "name": "statuspulse-fulfillment",
+            "main": "worker.js",
+            "compatibility_date": "2026-08-27",
+            "compatibility_flags": ["nodejs_compat"],
+            "account_id": "$account_id",
+            "vars": {
+              "STATUSPULSE_ALLOW_LIVE": "$STATUSPULSE_ALLOW_LIVE",
+              "STATUSPULSE_PAYMENT_LINK_ID": "$STATUSPULSE_PAYMENT_LINK_ID"
+            },
+            "d1_databases": [
+              {
+                "binding": "DB",
+                "database_name": "statuspulse",
+                "database_id": "$database_id",
+                "migrations_dir": "migrations"
+              }
+            ],
+            "triggers": {
+              "crons": []
+            },
+            "observability": {
+              "enabled": true,
+              "head_sampling_rate": 1
+            }
+          }
           EOF
 
-      - name: Apply D1 schema
-        run: npx --yes wrangler@4.125.0 d1 execute statuspulse --remote --file=schema.sql
+      - name: Preflight pending destructive migration
+        run: |
+          set -euo pipefail
+          migration_name='0001_statuspulse_order_state_v2.sql'
+          migrations_table_exists=$(npx --yes wrangler@4.125.0 d1 execute statuspulse --remote --json --command \
+            "SELECT COUNT(*) AS count FROM sqlite_master WHERE type='table' AND name='d1_migrations'" \
+            | jq -r '.[0].results[0].count')
+          migration_applied=0
+          if [ "$migrations_table_exists" = '1' ]; then
+            migration_applied=$(npx --yes wrangler@4.125.0 d1 execute statuspulse --remote --json --command \
+              "SELECT COUNT(*) AS count FROM d1_migrations WHERE name='$migration_name'" \
+              | jq -r '.[0].results[0].count')
+          fi
+          if [ "$migration_applied" = '0' ]; then
+            for table in stripe_events entitlements access_sessions deliveries funnel_events orders order_events refunds risk_events rejected_events; do
+              table_exists=$(npx --yes wrangler@4.125.0 d1 execute statuspulse --remote --json --command \
+                "SELECT COUNT(*) AS count FROM sqlite_master WHERE type='table' AND name='$table'" \
+                | jq -r '.[0].results[0].count')
+              if [ "$table_exists" = '1' ]; then
+                row_count=$(npx --yes wrangler@4.125.0 d1 execute statuspulse --remote --json --command \
+                  "SELECT COUNT(*) AS count FROM $table" \
+                  | jq -r '.[0].results[0].count')
+                if [ "$row_count" != '0' ]; then
+                  echo "Refusing migration: legacy table $table has $row_count row(s)." >&2
+                  exit 1
+                fi
+              fi
+            done
+          fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-      - name: Install Stripe webhook secret
+      - name: Apply versioned D1 migrations
+        run: npx --yes wrangler@4.125.0 d1 migrations apply statuspulse --remote
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Verify D1 schema contract
+        run: |
+          set -euo pipefail
+          schema_result=$(npx --yes wrangler@4.125.0 d1 execute statuspulse --remote --json --command \
+            "SELECT CASE WHEN
+              (SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name IN ('orders','order_events','refunds','risk_events','rejected_events','schema_versions')) = 6
+              AND (SELECT COUNT(*) FROM pragma_table_info('orders') WHERE name IN ('checkout_state','checkout_event_created_at','eligibility_state','fulfillment_state')) = 4
+              AND (SELECT COUNT(*) FROM pragma_table_info('refunds') WHERE name='stripe_created_at') = 1
+              AND (SELECT COUNT(*) FROM pragma_table_info('risk_events') WHERE name='stripe_created_at') = 1
+              AND COALESCE((SELECT MAX(version) FROM schema_versions), 0) >= 2
+            THEN 1 ELSE 0 END AS ok")
+          printf '%s' "$schema_result" | jq -e '.[0].results[0].ok == 1' >/dev/null
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Deploy Worker and Stripe secret atomically
         env:
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.ndjson
         run: |
-          if [ -z "$STRIPE_WEBHOOK_SECRET" ]; then
-            echo 'STRIPE_WEBHOOK_SECRET is not configured; skipping secret update.'
-            exit 0
-          fi
-          printf '%s' "$STRIPE_WEBHOOK_SECRET" | npx --yes wrangler@4.125.0 secret put STRIPE_WEBHOOK_SECRET
+          set -euo pipefail
+          test -n "$STRIPE_WEBHOOK_SECRET"
+          umask 077
+          secrets_file="${RUNNER_TEMP}/statuspulse-worker-secrets.env"
+          printf 'STRIPE_WEBHOOK_SECRET=%s\n' "$STRIPE_WEBHOOK_SECRET" > "$secrets_file"
+          npx --yes wrangler@4.125.0 deploy --secrets-file "$secrets_file"
 
-      - name: Deploy Worker
-        run: npx --yes wrangler@4.125.0 deploy
+      - name: Validate Worker health response
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Upload current release to R2
+          WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.ndjson
         run: |
-          npx --yes wrangler@4.125.0 r2 object put statuspulse-releases/statusfeed.db --file=statusfeed.db --remote
-          python3 - <<'PY'
-          import csv, sqlite3
-          with sqlite3.connect('statusfeed.db') as db, open('statuspulse.csv', 'w', newline='') as out:
-              rows = db.execute('SELECT * FROM incidents ORDER BY started_at DESC')
-              writer = csv.writer(out)
-              writer.writerow([column[0] for column in rows.description])
-              writer.writerows(rows)
-          PY
-          npx --yes wrangler@4.125.0 r2 object put statuspulse-releases/statuspulse.csv --file=statuspulse.csv --remote
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Print Worker URL
-        run: npx --yes wrangler@4.125.0 deployments list | head -20
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          set -euo pipefail
+          worker_url=$(jq -r \
+            'select(.type == "deploy") | .targets[0] // empty' \
+            "$WRANGLER_OUTPUT_FILE_PATH" | tail -n 1)
+          case "$worker_url" in
+            https://*) ;;
+            *)
+              echo 'Wrangler did not report a valid HTTPS deployment target' >&2
+              exit 1
+              ;;
+          esac
+          curl --fail --silent --show-error --retry 5 --retry-delay 2 \
+            "${worker_url%/}/healthz" >/dev/null
 
       - name: Remove temporary files
         if: always()
-        run: rm -f .d1-id .account-id wrangler.toml statuspulse.csv
-
-      - name: Validate Worker health response
-        run: |
-          url="https://statuspulse-fulfillment.$(npx --yes wrangler@4.125.0 whoami 2>/dev/null | awk '/Account ID/ {print "workers.dev"}' || true)"
-          echo "Deployment completed; the exact workers.dev hostname is shown in the deploy step output."
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: rm -f .d1-id .account-id wrangler.jsonc "${RUNNER_TEMP}/statuspulse-worker-secrets.env"

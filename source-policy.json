@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "policy_id": "statuspulse-commercial-source-rights-v1",
+  "default_state": "disabled",
+  "reviewed_on": "2026-08-27",
+  "next_review_on": "2026-11-27",
+  "purpose": "Fail-closed source-rights policy for StatusPulse commercial incident records.",
+  "legal_note": "This operational policy records a conservative source review; it is not legal advice or a substitute for written permission.",
+  "required_public_disclosures": {
+    "analysis": "StatusPulse calculations and normalized records are independently produced from the cited official sources.",
+    "source_links": "Each record must retain an exact official incident permalink.",
+    "non_affiliation": "StatusPulse is independent and is not affiliated with, endorsed by, or sponsored by Atlassian or Google.",
+    "historical_not_realtime": "The dataset is historical research material, not a real-time monitoring or outage-alerting service.",
+    "google_attribution": "Source incident identifiers and factual service-health fields are attributed to Google Cloud through each official incident link."
+  },
+  "global_prohibited_fields": [
+    "external_desc",
+    "incident update message",
+    "incident update text",
+    "postmortem narrative",
+    "root-cause narrative",
+    "raw JSON response"
+  ],
+  "sources": {
+    "atlassian": {
+      "provider": "Atlassian",
+      "state": "enabled",
+      "decision": "Use the documented public Status API only, retaining a minimal factual normalization and an exact source link.",
+      "endpoint": "https://status.atlassian.com/api/v2/incidents.json",
+      "interface_documentation": "https://support.atlassian.com/statuspage/docs/what-are-the-different-apis-under-statuspage/",
+      "permalink_template": "https://status.atlassian.com/incidents/{incident_id}",
+      "evidence_urls": [
+        "https://support.atlassian.com/statuspage/docs/what-are-the-different-apis-under-statuspage/",
+        "https://www.atlassian.com/legal/acceptable-use-policy",
+        "https://www.atlassian.com/legal/trademark"
+      ],
+      "allowed_fields": [
+        "incident ID",
+        "synthetic non-narrative label",
+        "normalized status",
+        "start timestamp",
+        "end timestamp",
+        "collector timestamp",
+        "exact official incident permalink",
+        "independently calculated metrics"
+      ],
+      "details_fields": [],
+      "attribution": "Attribute every record to the exact Atlassian Status incident permalink; use Atlassian only as a plain-text source name and include the non-affiliation disclosure."
+    },
+    "google-cloud": {
+      "provider": "Google Cloud",
+      "state": "enabled",
+      "decision": "Use the documented public JSON history interface and only fields documented as stable or factual identifiers; omit all descriptive text.",
+      "endpoint": "https://status.cloud.google.com/incidents.json",
+      "interface_documentation": "https://docs.cloud.google.com/service-health/docs/service-health-fallback",
+      "permalink_template": "https://status.cloud.google.com/incidents/{incident_id}",
+      "evidence_urls": [
+        "https://docs.cloud.google.com/service-health/docs/service-health-fallback",
+        "https://policies.google.com/terms?hl=en-US"
+      ],
+      "allowed_fields": [
+        "incident ID",
+        "provider incident number",
+        "synthetic non-narrative label",
+        "normalized status",
+        "start timestamp",
+        "end timestamp",
+        "collector timestamp",
+        "stable affected product IDs",
+        "stable affected location IDs",
+        "exact official incident permalink",
+        "independently calculated metrics"
+      ],
+      "details_fields": [
+        "affected_location_ids",
+        "affected_product_ids",
+        "provider_number"
+      ],
+      "attribution": "Attribute every record to the exact Google Cloud Service Health incident permalink and include the Google source attribution, non-affiliation, and historical-not-realtime disclosures."
+    },
+    "github": {
+      "provider": "GitHub",
+      "state": "pending",
+      "decision": "Do not access or store until written commercial-use permission is retained.",
+      "evidence_urls": [
+        "https://www.githubstatus.com/",
+        "https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies",
+        "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service"
+      ]
+    },
+    "cloudflare": {
+      "provider": "Cloudflare",
+      "state": "pending",
+      "decision": "Do not access or store until written commercial-use permission is retained.",
+      "evidence_urls": [
+        "https://www.cloudflare.com/website-terms/"
+      ]
+    },
+    "twilio": {
+      "provider": "Twilio",
+      "state": "pending",
+      "decision": "Do not access or store until written commercial-use permission is retained.",
+      "evidence_urls": [
+        "https://status.twilio.com/",
+        "https://www.twilio.com/en-us/legal/tos"
+      ]
+    },
+    "supabase": {
+      "provider": "Supabase",
+      "state": "pending",
+      "decision": "Do not access or store until written commercial-use permission is retained.",
+      "evidence_urls": [
+        "https://status.supabase.com/",
+        "https://supabase.com/terms"
+      ]
+    },
+    "datadog": {
+      "provider": "Datadog",
+      "state": "disabled",
+      "decision": "Permission required before commercial collection, storage, or redistribution.",
+      "evidence_urls": [
+        "https://www.datadoghq.com/legal/terms/",
+        "https://www.datadoghq.com/legal/acceptable-use/"
+      ]
+    },
+    "vercel": {
+      "provider": "Vercel",
+      "state": "disabled",
+      "decision": "Permission required before commercial collection, storage, or redistribution.",
+      "evidence_urls": [
+        "https://vercel.com/legal/acceptable-use-policy",
+        "https://vercel.com/legal/api-terms"
+      ]
+    },
+    "digitalocean": {
+      "provider": "DigitalOcean",
+      "state": "disabled",
+      "decision": "Permission required before commercial collection, storage, or redistribution.",
+      "evidence_urls": [
+        "https://www.digitalocean.com/legal/terms-of-service-agreement",
+        "https://www.digitalocean.com/legal/acceptable-use-policy"
+      ]
+    },
+    "openai": {
+      "provider": "OpenAI",
+      "state": "disabled",
+      "decision": "Permission required before commercial collection, storage, or redistribution.",
+      "evidence_urls": [
+        "https://openai.com/policies/terms-of-use/",
+        "https://cdn.openai.com/osa/openai-services-agreement.pdf"
+      ]
+    },
+    "aws": {
+      "provider": "Amazon Web Services",
+      "state": "disabled",
+      "decision": "Permission required before commercial collection, storage, or redistribution.",
+      "evidence_urls": [
+        "https://aws.amazon.com/terms/",
+        "https://docs.aws.amazon.com/health/latest/ug/aws-health-dashboard-status.html"
+      ]
+    }
+  }
+}

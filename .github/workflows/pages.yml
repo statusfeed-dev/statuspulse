@@ -20,29 +20,39 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Verify generated release is fresh and internally consistent
-        run: |
-          python3 - <<'PY'
-          import json, sqlite3
-          db = sqlite3.connect('statusfeed.db')
-          total = db.execute('SELECT COUNT(*) FROM incidents').fetchone()[0]
-          stats = json.load(open('stats.json'))
-          assert stats['total'] == total, (stats['total'], total)
-          assert stats['last30d'] >= 0
-          assert stats['unresolved'] == db.execute("SELECT COUNT(*) FROM incidents WHERE status != 'resolved'").fetchone()[0]
-          print(f'validated total={total} last30d={stats["last30d"]} unresolved={stats["unresolved"]}')
-          PY
+
+      - name: Build strict public artifact allowlist
+        run: python3 validate_release.py stage-public . _site
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
-      - name: Upload artifact
+
+      - name: Upload public artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-      - name: Verify published page
-        run: curl --fail --silent --show-error "${{ steps.deployment.outputs.page_url }}" >/dev/null
+
+      - name: Verify published allowlist
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          base_url="${PAGE_URL%/}"
+          curl --fail --silent --show-error --retry 5 --retry-delay 2 \
+            "$base_url/" >/dev/null
+          curl --fail --silent --show-error --retry 5 --retry-delay 2 \
+            "$base_url/statuspulse-sample.csv" >/dev/null
+          database_status=$(curl --silent --show-error --output /dev/null \
+            --write-out '%{http_code}' "$base_url/statusfeed.db")
+          if [ "$database_status" != '404' ]; then
+            echo "Expected private database path to return 404, got $database_status" >&2
+            exit 1
+          fi

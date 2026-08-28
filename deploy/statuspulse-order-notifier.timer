@@ -1,0 +1,12 @@
+[Unit]
+Description=Check for paid StatusPulse pilot orders every 30 minutes
+
+[Timer]
+OnBootSec=5m
+OnUnitInactiveSec=30m
+RandomizedDelaySec=3m
+Persistent=true
+Unit=statuspulse-order-notifier.service
+
+[Install]
+WantedBy=timers.target

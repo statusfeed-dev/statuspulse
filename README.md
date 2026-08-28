@@ -1,73 +1,101 @@
 # StatusPulse
 
-Cross-provider status-page incident history for SRE, platform, vendor-management, and reliability-research workflows.
+StatusPulse turns source-policy-gated incident facts and cited primary-source links into fixed-scope dependency evidence briefs for agencies, MSPs, and small SaaS teams.
 
-**Live preview and paid path:** https://statusfeed-dev.github.io/statuspulse/
+**Live site:** https://statusfeed-dev.github.io/statuspulse/
 
-## Free lead magnets
+## Pilot offer
 
-- Download the current 100-row sample: https://statusfeed-dev.github.io/statuspulse/statuspulse-sample.csv
-- Use the dependency-free [statuspulse-export.py](statuspulse-export.py) CLI to export recent incidents from any official Statuspage.io-powered endpoint.
-- Public lead-magnet repo: https://github.com/statusfeed-dev/statuswatch
+The validation offer is a **$79 one-time Vendor Dependency Evidence Brief** for up to 20 named SaaS or cloud dependencies. It includes:
 
-Example:
+- A print-ready, cited report.
+- A supporting CSV with direct source URLs.
+- Official status, support, service-health, and policy links.
+- Source-policy-gated incident metrics, evidence gaps, and due-diligence questions.
+- Delivery within two business days.
+- One factual-correction pass.
 
-```bash
-python3 statuspulse-export.py https://www.githubstatus.com 30 incidents.csv
-```
+It is not a subscription, real-time status service, synthetic monitoring, independent audit, SLA determination, legal advice, or uptime guarantee. The first validation link is US-only and capped at three completed purchases.
 
-## Paid release
+## Public preview and private release boundary
 
-The paid release is a current downloadable CSV + SQLite snapshot covering official incident timelines from GitHub, Cloudflare, Datadog, Vercel, Supabase, Twilio, Atlassian, DigitalOcean, OpenAI, Google Cloud, and AWS.
+The public site intentionally contains only an allowlisted preview:
 
-- Founding member: **$3/month** — [subscribe](https://buy.stripe.com/bJe5kE4MF2Yq2oG2fX8og01)
-- Standard: **$5/month** — [subscribe](https://buy.stripe.com/9B6eVe0wp7eGaVc1bT8og00)
-- Pro: **$9/month** — [subscribe](https://buy.stripe.com/6oUdRacf756ybZgf2J8og02)
-- Annual: **$79/year** — [subscribe](https://buy.stripe.com/bJe8wQ92VbuW4wO4o58og03)
+- Generated landing page and methodology.
+- A current sample of at most 100 records with source URLs.
+- Aggregate statistics.
+- Terms, privacy, refund, and support pages.
 
-The production fulfillment Worker grants authenticated, 24-hour access to the current release after a verified Stripe Checkout webhook. The static preview itself is not an API endpoint.
+The full SQLite database and full CSV are private R2 objects. `statusfeed.db`, `statuspulse.csv`, local operations databases, and release working directories are ignored by Git and rejected by the Pages build. Historical repository commits may still contain older snapshots, so the product does not claim that previously published facts are exclusive.
 
-The fulfillment host root and `/healthz` return a simple availability response. The Stripe webhook requires a signed `POST`; opening it with a browser returns `405 Method Not Allowed`.
+## Data refresh
 
-## Paid fulfillment service
+`.github/workflows/refresh-data.yml` is the only scheduled collector. It:
 
-The reference service uses only the Python standard library. The production Worker uses D1 and R2. A valid `checkout.session.completed` webhook for a paid subscription creates an entitlement. Stripe Checkout redirects to:
+1. Downloads the canonical private SQLite database from R2.
+2. Validates database integrity and schema.
+3. Runs the deterministic Python collector.
+4. Regenerates the public preview and full private CSV from the same database.
+5. Rejects row loss or inconsistent artifacts.
+6. Writes versioned recovery objects before replacing the canonical R2 objects.
+7. Commits only explicit public artifacts.
 
-`https://YOUR_FULFILLMENT_HOST/checkout/success?session_id={CHECKOUT_SESSION_ID}`
+The collector fails closed against `source_policy.py`: it requests and retains only sources with documented supported public integration paths or separate written permission. Hermes must not run a duplicate collector.
 
-That redirect exchanges the non-guessable Checkout Session ID for a random, expiring, `Secure`/`HttpOnly` cookie. The CSV is generated from the current `statusfeed.db`; the SQLite download returns that same current database. Both download endpoints re-check the active entitlement. A `customer.subscription.deleted` event revokes it. The local operations database stores only Stripe event IDs, Checkout Session IDs, subscription IDs, active state, timestamps, and hashes of access tokens—no customer, payment, or card data.
+## Local verification
 
-Local test setup (fixture values only):
+The Python implementation uses only the standard library:
 
 ```bash
 python3 -m unittest -v
-STRIPE_WEBHOOK_SECRET=fixture_signing_secret PORT=8000 python3 fulfillment.py
+python3 generate_site.py
+mkdir -p .release
+python3 export_release.py statusfeed.db .release/statuspulse.csv
+python3 validate_release.py release \
+  --database statusfeed.db \
+  --stats stats.json \
+  --sample statuspulse-sample.csv \
+  --mttr-stats mttr_stats.json \
+  --full-csv .release/statuspulse.csv \
+  --minimum-rows 1
 ```
 
-Do not put secrets in `.env`, source control, command output, or client-side code. Supply production secrets through the hosting platform's secret manager. See [stripe-listing.md](stripe-listing.md) for the production checklist.
+The production Cloudflare Worker should be tested with the repository's Worker test suite before deployment. Secrets belong in platform secret stores, never source control or command output.
 
-For test-mode verification, set `STATUSPULSE_ALLOW_TEST=true` and provide the separate Stripe test webhook signing secret as `STRIPE_TEST_WEBHOOK_SECRET`. These settings are intentionally absent from the production deployment, which remains live-only.
+## Order notification and delivery
 
-Each record includes source URL and collection timestamp. Statuspage records also retain normalized component and update-count details; provider-specific records retain additional raw public metadata in `details`. AWS/Azure/GCP/OpenAI coverage may have different public-history windows and schemas, so compare only with the stated source and coverage metadata.
+`order_notifier.py` independently polls Stripe for paid pilot orders. It records
+each order in the private `ops.db` ledger and sends the owner a minimal Telegram
+alert without copying customer intake into Telegram. After delivery, start the
+90-day intake-retention window:
 
-## Files
+```bash
+python3 order_notifier.py mark-delivered cs_live_REPLACE_ME
+```
 
-- `index.html` — generated public teaser page
-- `statuspulse-sample.csv` — free 100-row sample
-- `collect.py` — hourly collector using official public status APIs only
-- `generate_site.py` — regenerates the page and sample from the local DB
-- `statuspulse-export.py` — free CLI lead magnet
-- `fulfillment.py` — local reference implementation and tests for signed webhook processing, entitlements, authentication, and downloads
-- `worker.js` — production Cloudflare Worker fulfillment boundary
-- `test_fulfillment.py` — fulfillment security and download tests
-- `stripe-listing.md` — product copy and fulfillment boundary
+Hardened user-service templates are in `deploy/`. Their private environment
+file must contain only `STRIPE_API_KEY`, `STATUSPULSE_PAYMENT_LINK_ID`,
+`TELEGRAM_BOT_TOKEN`, `TELEGRAM_HOME_CHANNEL`, and `STATUSPULSE_OPS_DB`, and
+must use mode `0600`.
 
-## Data schema
+## Data fields
 
-`id, source, name, status, impact, started_at, resolved_at, fetched_at`
+The private normalized database uses:
 
-All collection uses official `/api/v2` endpoints and respects rate limits. Not affiliated with any listed provider.
+`id, source, name, status, impact, started_at, resolved_at, fetched_at, source_url, details`
 
-## License
+The public sample omits raw `details` and provider narratives but includes `source_url`, allowing a buyer to inspect provenance.
 
-The CLI lead magnet is MIT licensed in its separate public repository. The collected dataset is offered under the checkout terms.
+## Key files
+
+- `collect.py` — deterministic official-feed collector.
+- `generate_site.py` — public page, sample, and aggregate-stat generation.
+- `release_contract.py` — shared schema, validation, and public allowlist rules.
+- `validate_release.py` — release and Pages-boundary validation commands.
+- `export_release.py` — atomic full-release CSV export.
+- `order_notifier.py` — private order ledger, owner notification, and intake retention.
+- `worker.js` — Stripe webhook and private order-state boundary.
+- `schema.sql` — production D1 schema.
+- `stripe-listing.md` — exact product and checkout configuration.
+
+StatusPulse is not affiliated with, endorsed by, or sponsored by any listed provider. Provider names identify the services analyzed; calculations and commentary are StatusPulse's.

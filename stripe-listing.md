@@ -1,65 +1,66 @@
-# StatusPulse — Stripe listing copy
+# StatusPulse — Stripe listing
 
-## Product name
-StatusPulse Incident History — recurring data release
+## Product
 
-## Short description
-Continuously refreshed cross-provider incident history for SRE, platform, vendor-management, and reliability-research workflows.
+**Vendor Dependency Evidence Brief — Pilot**
 
-## Full description
-StatusPulse preserves incident timelines from official public Statuspage API endpoints across GitHub, Cloudflare, Datadog, Vercel, Supabase, Twilio, Atlassian, and DigitalOcean.
+One fixed-scope evidence brief for up to 20 named SaaS or cloud dependencies. Includes an official-source map, source-policy-gated normalized incident metrics, evidence gaps, due-diligence questions, a print-ready report, supporting CSV, direct source links, and one factual-correction pass. Delivered to the checkout email within two business days.
 
-The paid release is a current downloadable CSV and SQLite snapshot with incident identity, provider, incident name, status, impact, start/resolution timestamps, fetch provenance, source URL, and provider-specific incident details. Use it to support vendor reviews, postmortems, reliability research, SLO reporting, and historical comparisons without manually collecting official status pages.
+This is not synthetic monitoring, an uptime or SLA guarantee, legal advice, or an independent audit.
 
-This is historical incident data, not synthetic monitoring, an uptime guarantee, or an API endpoint. Subscribers receive authenticated access to the current release immediately after successful checkout.
+## Price and capacity
 
-## Plans
+- **US $79 one time.** No recurring charge.
+- Maximum three completed pilot checkouts.
+- Initial sales are limited to US customers.
+- Applicable tax is calculated by Stripe Checkout under the account's configured tax settings.
 
-- **Founding member — $3/month:** current full CSV + SQLite release at the founding rate while available.
-- **Standard — $5/month:** current full CSV + SQLite release.
-- **Pro — $9/month:** current full CSV + SQLite release.
-- **Annual — $79/year:** current full CSV + SQLite release for one year.
+## Checkout intake
 
-## Included fields
+Required:
 
-`id, source, name, status, impact, started_at, resolved_at, fetched_at, source_url, details`
+- Business name.
+- Checkout email.
+- A comma-separated list of up to 20 non-confidential vendor names.
+- Acceptance of the published Terms. The link must remain inactive until Stripe Public details contains the Terms URL and Checkout enforces acceptance.
 
-## Free preview
+Optional:
 
-- Live preview: https://statusfeed-dev.github.io/statuspulse/
-- 100-row sample: https://statusfeed-dev.github.io/statuspulse/statuspulse-sample.csv
-- Free CLI exporter: https://github.com/statusfeed-dev/statuspulse-export
+- Primary purpose: renewal review, vendor due diligence, architecture review, or other.
 
-## Checkout links
+Do not request credentials, customer records, security findings, personal data, health data, payment data, or other sensitive information in a custom field.
 
-- Standard: https://buy.stripe.com/9B6eVe0wp7eGaVc1bT8og00
-- Founding member: https://buy.stripe.com/bJe5kE4MF2Yq2oG2fX8og01
+## Public policies
 
-## Fulfillment implementation
+- Terms: https://statusfeed-dev.github.io/statuspulse/terms.html
+- Privacy: https://statusfeed-dev.github.io/statuspulse/privacy.html
+- Refunds: https://statusfeed-dev.github.io/statuspulse/refunds.html
+- Support: https://statusfeed-dev.github.io/statuspulse/support.html
 
-`fulfillment.py` implements the deployable fulfillment boundary. It verifies Stripe webhook signatures with a five-minute tolerance, rejects live-mode fixture events during local/test use, processes events idempotently, grants access only for paid subscription checkouts, revokes canceled subscriptions, and protects both full-dataset formats behind an expiring authenticated session.
+The Stripe account's public business details must identify the seller and provide a private support contact before the link is published.
 
-## Manual production steps
+## Fulfillment contract
 
-No Stripe resources or deployments are created by this repository. Before production, an operator must:
+The production webhook must accept only the configured pilot Payment Link. Before queuing an order it verifies:
 
-1. Deploy `fulfillment.py` behind HTTPS with persistent storage for `ops.db` and read access to the refreshed `statusfeed.db`.
-2. Set `STRIPE_WEBHOOK_SECRET` in the platform secret manager (never `.env` or source control). Optionally set `STATUSPULSE_OPS_DB`, `STATUSPULSE_DATASET_DB`, and `PORT`.
-3. In Stripe, set each Checkout/Payment Link success redirect to `https://YOUR_FULFILLMENT_HOST/checkout/success?session_id={CHECKOUT_SESSION_ID}`.
-4. Create a Stripe webhook endpoint at `https://YOUR_FULFILLMENT_HOST/stripe/webhook` for `checkout.session.completed` and `customer.subscription.deleted`, then place its signing secret in the platform secret manager.
-5. First repeat the complete flow in Stripe test mode. Confirm an unpaid or invalidly signed event grants nothing, a paid subscription enables both downloads, replaying the event changes nothing, and cancellation revokes access.
-6. Only after the test flow passes, explicitly set `STATUSPULSE_ALLOW_LIVE=true` in the production secret/configuration manager. Rotate the production signing secret if it is ever exposed, and configure backups/retention for the minimal operations database.
+- Live/test mode is explicitly enabled for the environment.
+- Checkout mode is `payment`.
+- Payment status is `paid`.
+- The Payment Link ID matches the environment allowlist.
+- Offer metadata matches `vendor_reliability_pilot`, version `1`.
+- Currency is USD and total is exactly 7900 cents plus any separately reported tax.
 
-For a safe test-mode deployment, use a separate Worker environment or temporary deployment configuration with `STATUSPULSE_ALLOW_TEST=true` and `STRIPE_TEST_WEBHOOK_SECRET` set to the test webhook endpoint's signing secret. Do not enable test mode on the production Worker unless the test secret is separately configured and the change is intentional.
+The handler records events idempotently, never treats the confirmation-page view as delivery, and tracks asynchronous payment and refund states. Refund initiation remains owner-controlled.
 
-The current implementation deliberately does not create Stripe customers, prices, charges, webhooks, or deployments and does not send email. Checkout's success redirect is the delivery path.
+## Validation gate
 
-## Refund/support policy draft
+Before publishing the live URL:
 
-If the first release is not usable for the stated fields and coverage, contact the publisher within 7 days for support or a refund review. Coverage depends on the availability and content of each provider's official public status endpoint.
+1. Deploy and pass Worker tests.
+2. Complete the same flow with a separate Stripe sandbox key and webhook.
+3. Confirm a wrong link, wrong amount, unpaid session, replayed event, and invalid signature queue nothing.
+4. Confirm the four retired subscription links are inactive.
+5. Confirm the new Price is one-time USD 7900 and the link is capped at three completions.
+6. Confirm Stripe public business, Terms, Privacy, support, tax, and receipt settings in the Dashboard.
 
-## Keywords
-
-incident history, vendor reliability, SRE data, status page data, postmortem analysis, vendor due diligence, MTTR, SQLite, CSV, cloud infrastructure
-
-*Not affiliated with Atlassian or any listed provider.*
+Refunds are approved and initiated by the owner through Stripe. The agent may detect and report refund events but may not initiate money movement.
