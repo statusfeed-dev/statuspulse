@@ -1,13 +1,13 @@
 {
-  "total": 39,
-  "last30d": 1,
+  "total": 40,
+  "last30d": 2,
   "coverage_start": "2019-05-07T09:45:37.229Z",
-  "coverage_end": "2026-08-20T15:40:00+00:00",
-  "computed_at": "2026-09-01T12:34:43.747717+00:00",
+  "coverage_end": "2026-09-01T14:44:00+00:00",
+  "computed_at": "2026-09-01T18:32:10.538914+00:00",
   "by_source": {
-    "google-cloud": 5,
+    "google-cloud": 6,
     "atlassian": 34
   },
-  "active_reports_30d": 0,
-  "unresolved": 0
+  "active_reports_30d": 1,
+  "unresolved": 1
 }
