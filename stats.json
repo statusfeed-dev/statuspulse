@@ -3,11 +3,11 @@
   "last30d": 2,
   "coverage_start": "2019-05-07T09:45:37.229Z",
   "coverage_end": "2026-09-01T14:44:00+00:00",
-  "computed_at": "2026-09-01T18:32:10.538914+00:00",
+  "computed_at": "2026-09-02T00:36:36.013398+00:00",
   "by_source": {
     "google-cloud": 6,
     "atlassian": 34
   },
-  "active_reports_30d": 1,
-  "unresolved": 1
+  "active_reports_30d": 0,
+  "unresolved": 0
 }
