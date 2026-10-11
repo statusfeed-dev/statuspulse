@@ -3,7 +3,7 @@
   "last30d": 1,
   "coverage_start": "2019-05-07T09:45:37.229Z",
   "coverage_end": "2026-10-08T12:19:00+00:00",
-  "computed_at": "2026-10-11T05:52:27.780352+00:00",
+  "computed_at": "2026-10-11T12:56:03.540063+00:00",
   "by_source": {
     "google-cloud": 7,
     "atlassian": 34
